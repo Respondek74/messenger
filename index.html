@@ -36,27 +36,30 @@
         #intro-overlay.active { display: flex; }
         #intro-overlay.fade-out { opacity: 0; visibility: hidden; }
 
-        .intro-logo-container { width: 85%; max-width: 450px; margin-bottom: 30px; }
-        .intro-logo-container svg { width: 100%; height: auto; fill: white; }
+        .logo-container { width: 80%; max-width: 450px; margin-bottom: 30px; }
+        .canyon-svg { fill: white; width: 100%; height: auto; display: block; }
 
         .intro-text { font-size: 18px; color: var(--text-white); margin-bottom: 45px; font-weight: 300; letter-spacing: 1px; opacity: 0.8; }
-
         .loader-container { width: 220px; height: 2px; background: #222; border-radius: 2px; overflow: hidden; }
         .loader-bar { width: 0%; height: 100%; background: var(--text-white); transition: width 5s linear; }
 
         /* --- App Layout --- */
-        .app-container { display: none; flex-direction: column; height: 100vh; position: relative; }
-        .app-container.visible { display: flex; }
+        .app-container { display: flex; flex-direction: column; height: 100vh; position: relative; visibility: hidden; }
+        .app-container.visible { visibility: visible; }
 
         header {
             background-color: var(--bg-black);
             padding: 15px 0;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             border-bottom: 0.5px solid var(--border-gray);
             z-index: 10;
         }
-        header .header-logo-svg { height: 18px; width: auto; fill: white; }
+        .header-logo-container { height: 18px; width: auto; }
+        .header-logo-container svg { height: 100%; width: auto; fill: white; display: block; }
 
+        /* Navigation Views */
         .view {
             flex: 1; display: flex; flex-direction: column;
             position: absolute; top: 55px; bottom: 80px; width: 100%;
@@ -67,16 +70,15 @@
         #detailView { z-index: 6; transform: translateX(100%); opacity: 0; visibility: hidden; }
         
         .view-hidden { transform: scale(0.96); opacity: 0; pointer-events: none; }
-        .view-active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; }
+        .view-active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; }
 
-        /* Chat List */
+        /* Chat UI */
         .chat-item { display: flex; padding: 14px 16px; align-items: center; border-bottom: 0.5px solid var(--border-gray); cursor: pointer; }
         .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; flex-shrink: 0; }
         .chat-preview { flex: 1; min-width: 0; }
         .chat-preview .name { display: block; font-weight: 600; font-size: 16px; margin-bottom: 2px; }
         .chat-preview .sub { color: var(--text-gray); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Detail View */
         .chat-detail-header { padding: 10px 15px; background: var(--header-dark); display: flex; align-items: center; border-bottom: 0.5px solid var(--border-gray); }
         .back-btn { font-size: 30px; color: var(--accent-blue); padding-right: 15px; cursor: pointer; }
         .message-area { flex: 1; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
@@ -90,7 +92,7 @@
         .user .msg { background: var(--message-user); }
         .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
 
-        /* Antwort-Buttons */
+        /* Action Buttons */
         .mobile-actions { padding: 18px; background: var(--header-dark); display: flex; flex-direction: column; gap: 12px; border-top: 0.5px solid var(--border-gray); }
         .action-card {
             background-color: var(--action-button-bg); border: none; color: var(--text-white);
@@ -99,7 +101,10 @@
             line-height: 1.35; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
         .action-card:active { opacity: 0.8; transform: scale(0.98); }
-        .action-card::after { content: "›"; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.4); font-size: 24px; font-weight: 300; }
+        .action-card::after { 
+            content: "›"; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); 
+            color: rgba(255, 255, 255, 0.4); font-size: 24px; font-weight: 300;
+        }
 
         .voice-bubble { background: var(--message-bot); padding: 12px; border-radius: 20px; display: flex; align-items: center; gap: 12px; min-width: 220px; cursor: pointer; }
         .play-btn { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: none; font-size: 12px; }
@@ -108,24 +113,26 @@
         .tab-item { text-align: center; color: var(--text-gray); font-size: 10px; }
         .tab-item.active { color: var(--text-white); }
         .tab-icon { font-size: 22px; display: block; margin-bottom: 4px; }
-        
         .hidden { display: none; }
         .typing { font-size: 12px; color: var(--text-gray); margin: 5px 0 0 15px; font-style: italic; }
 
-        /* Error Label */
-        #error-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #900; color:white; z-index:5000; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+        /* Error Message */
+        #error-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; color:white; z-index:5000; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+        .retry-btn { margin-top:20px; background:#444; border:none; color:white; padding:10px 20px; border-radius:5px; cursor:pointer;}
     </style>
 </head>
 <body>
 
 <div id="error-overlay">
-    <h2>data.json nicht gefunden!</h2>
-    <p>Stelle sicher, dass data.json im selben Verzeichnis wie index.html liegt.</p>
+    <div style="font-size: 40px; margin-bottom: 20px;">⚠️</div>
+    <h3>data.json nicht gefunden</h3>
+    <p style="color: var(--text-gray); max-width: 300px;">Stellen Sie sicher, dass data.json im Hauptverzeichnis auf GitHub liegt.</p>
+    <button class="retry-btn" onclick="location.reload()">Erneut versuchen</button>
 </div>
 
 <div id="intro-overlay">
-    <div class="intro-logo-container">
-        <svg version="1.1" viewBox="0 0 1024 144" xmlns="http://www.w3.org/2000/svg">
+    <div class="logo-container">
+        <svg version="1.1" class="canyon-svg" viewBox="0 0 1024 144" xmlns="http://www.w3.org/2000/svg">
             <path d="M25.395,1.187c-29.314,0-34.205,24.226-9.661,54.105l41.547,50.386c14.962,18.172,28.737,32.367,34.855,37.182 c0.169,0.129,0.336,0.18,0.582,0.18h42.101c-14.417-9.213-31.878-26.022-44.59-40.765L43.286,45.888 c-10.001-12.171-8.335-18.653,3.262-17.075c5.853,0.796,21.905,8.591,39.55,24.83h36.195C94.022,21.834,61.046,1.187,25.395,1.187"/>
             <path d="M150.207,144.215h28.946c-1.413-11.015-6.277-23.98-16.313-36.063h-31.816C142.457,121.96,147.63,132.572,150.207,144.215"/>
             <polyline points="635.381,105.377 589.001,4.065 560.189,4.065 594.771,73.428 593.829,73.418 501.408,4.065 460.456,4.065 605.27,111.18 633.093,144.188 668.105,144.188 635.381,105.377"/>
@@ -139,11 +146,16 @@
     <div class="loader-container"><div id="loader-bar" class="loader-bar"></div></div>
 </div>
 
-<div id="app-main" class="app-container">
+<div id="app-container" class="app-container">
     <header>
-        <div style="height: 18px; display: inline-block;">
-            <svg class="header-logo-svg" viewBox="0 0 1024 144" fill="white">
+        <div class="header-logo-container">
+            <svg version="1.1" viewBox="0 0 1024 144" xmlns="http://www.w3.org/2000/svg">
                 <path d="M25.395,1.187c-29.314,0-34.205,24.226-9.661,54.105l41.547,50.386c14.962,18.172,28.737,32.367,34.855,37.182 c0.169,0.129,0.336,0.18,0.582,0.18h42.101c-14.417-9.213-31.878-26.022-44.59-40.765L43.286,45.888 c-10.001-12.171-8.335-18.653,3.262-17.075c5.853,0.796,21.905,8.591,39.55,24.83h36.195C94.022,21.834,61.046,1.187,25.395,1.187"/>
+                <path d="M150.207,144.215h28.946c-1.413-11.015-6.277-23.98-16.313-36.063h-31.816C142.457,121.96,147.63,132.572,150.207,144.215"/>
+                <polyline points="635.381,105.377 589.001,4.065 560.189,4.065 594.771,73.428 593.829,73.418 501.408,4.065 460.456,4.065 605.27,111.18 633.093,144.188 668.105,144.188 635.381,105.377"/>
+                <polyline points="378.444,4.065 492.015,137.139 491.065,137.125 325.646,4.065 292.143,4.065 408.71,143.002 442.006,143.002 373.844,67.492 374.788,67.492 469.324,144.188 527.214,144.188 409.659,4.065 378.444,4.065"/>
+                <polyline points="875.228,4.065 988.803,137.139 987.853,137.125 822.423,4.065 788.905,4.065 905.503,143.002 938.777,143.002 871.859,67.492 871.569,67.492 966.105,144.188 1024,144.188 906.421,4.065 875.228,4.065"/>
+                <polyline points="163.511,4.065 235.119,143.008 264.936,143.008 210.593,41.637 211.512,41.637 316.461,144.188 354.064,144.188 207.5,4.065 163.511,4.065"/>
                 <path d="M740.176,102.202c12.736,14.765,30.229,31.595,44.652,40.8H742.68c-0.247,0-0.416-0.035-0.589-0.161 c-6.134-4.831-19.918-19.049-34.906-37.224l-41.587-50.439C641.017,25.257,645.919,1,675.264,1 c38.451,0,73.806,23.99,103.477,60.077l21.449,26.074c20.326,24.688,26.599,39.927,29.647,57.037h-27.56 c-2.594-11.646-7.771-22.271-19.208-36.092l-30.394-36.981c-23.372-28.343-48.561-41.403-56.249-42.449 c-11.586-1.572-13.254,4.914-3.254,17.099L740.176,102.202"/>
             </svg>
         </div>
@@ -173,7 +185,7 @@
 <script>
     let globalChatData = [];
 
-    // Automatisches Laden der JSON Datei (Optimiert für GitHub)
+    // Automatisches Laden (GitHub / Webserver)
     async function loadData() {
         try {
             const response = await fetch('data.json');
@@ -193,7 +205,7 @@
 
         setTimeout(() => {
             intro.classList.add('fade-out');
-            document.getElementById('app-main').classList.add('visible');
+            document.getElementById('app-container').classList.add('visible');
             buildChatList();
             setTimeout(() => intro.style.display = 'none', 1200);
         }, 5500);
@@ -262,7 +274,7 @@
         const area = document.getElementById('message-area');
         const wrapper = document.createElement('div');
         wrapper.className = `msg-wrapper ${type}`;
-        wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">${new Date().getHours()}:${new Date().getMinutes().toString().padStart(2,'0')}</div>`;
+        wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">18:16</div>`;
         area.appendChild(wrapper);
         area.scrollTop = area.scrollHeight;
     }
