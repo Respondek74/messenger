@@ -103,10 +103,8 @@
             color: rgba(255, 255, 255, 0.4); font-size: 24px; font-weight: 300;
         }
 
-        /* Voice Bubble mit Pause-Logik */
         .voice-bubble { background: var(--message-bot); padding: 12px; border-radius: 20px; display: flex; align-items: center; gap: 12px; min-width: 220px; cursor: pointer; }
-        .play-btn { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: none; font-size: 14px; transition: transform 0.1s; }
-        .play-btn:active { transform: scale(0.9); }
+        .play-btn { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: none; font-size: 14px; }
 
         .tab-bar { height: 80px; background-color: var(--header-dark); border-top: 0.5px solid var(--border-gray); display: flex; justify-content: space-around; align-items: center; padding-bottom: 20px; }
         .tab-item { text-align: center; color: var(--text-gray); font-size: 10px; }
@@ -223,6 +221,14 @@
         });
     }
 
+    // Hilfsfunktion für den 2036er Zeitstempel
+    function getTimestamp2036() {
+        const now = new Date();
+        const hrs = now.getHours().toString().padStart(2, '0');
+        const min = now.getMinutes().toString().padStart(2, '0');
+        return `${hrs}:${min} (18.02.2036)`;
+    }
+
     async function openChat(chat) {
         document.getElementById('listView').classList.add('view-hidden');
         const detail = document.getElementById('detailView');
@@ -271,7 +277,7 @@
         const area = document.getElementById('message-area');
         const wrapper = document.createElement('div');
         wrapper.className = `msg-wrapper ${type}`;
-        wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">18:16</div>`;
+        wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">${getTimestamp2036()}</div>`;
         area.appendChild(wrapper);
         area.scrollTop = area.scrollHeight;
     }
@@ -283,16 +289,13 @@
         wrapper.innerHTML = `
             <div class="voice-bubble" onclick="toggleAudio(this)">
                 <button class="play-btn">▶</button>
-                <div style="flex:1; height:4px; background:#444; border-radius:2px; position:relative;">
-                    <div id="audio-progress" style="position:absolute; height:100%; width:0%; background:var(--accent-blue);"></div>
-                </div>
+                <div style="flex:1; height:4px; background:#444; border-radius:2px; position:relative;"></div>
                 <span style="font-size:11px;">0:14</span>
             </div>
             <div style="font-size:12px; margin-top:8px; color:var(--text-gray); font-style:italic;">"${chat.voiceTxt}"</div>
         `;
         area.appendChild(wrapper);
 
-        // Audio Event Listener für automatischen Reset am Ende
         audioPlayer.onended = () => {
             const btn = document.querySelector('.play-btn');
             if(btn) btn.innerText = '▶';
@@ -301,12 +304,9 @@
 
     function toggleAudio(container) {
         const btn = container.querySelector('.play-btn');
-        
         if (audioPlayer.paused) {
             audioPlayer.src = 'BDC.wav';
-            audioPlayer.play().then(() => {
-                btn.innerText = '⏸';
-            }).catch(e => console.log("Audio Play blockiert"));
+            audioPlayer.play().then(() => { btn.innerText = '⏸'; }).catch(e => console.log("Audio Play blockiert"));
         } else {
             audioPlayer.pause();
             btn.innerText = '▶';
@@ -314,10 +314,8 @@
     }
 
     function closeChat() {
-        // Audio stoppen, wenn Roman den Chat verlässt
         audioPlayer.pause();
         audioPlayer.currentTime = 0;
-        
         document.getElementById('detailView').classList.remove('view-active');
         setTimeout(() => { 
             document.getElementById('detailView').style.display = 'none'; 
@@ -325,7 +323,6 @@
         }, 400);
     }
 
-    // Start
     loadData();
 </script>
 </body>
