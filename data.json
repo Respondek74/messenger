@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "Mathieu",
+    "initial": "M",
+    "color": "#ffffff",
+    "sub": "8-facher Weltmeister 🌈",
+    "initialMessages": [
+      "Hey Roman! 🌈 8 Titel... Wahnsinn.",
+      "Ganz ehrlich: 2026 dachte ich nur: 'Lass mich einfach Radfahren'.",
+      "Aber heute weiß ich: Diese Ruhe im Hintergrund hat mir den Kopf freigemacht. Das Material war heute perfekt. Danke fürs Durchhalten! 🏆"
+    ],
+    "options": [
+      { "t": "Glückwunsch! 👑 Wir haben das Fundament gebaut, fliegen musstest du!", "r": "Genau das ist es. Im roten Bereich muss der Backbone einfach unsichtbar funktionieren. Bis bald! 🥂" },
+      { "t": "Wir haben die Prozesse 'unsichtbar' gemacht, damit du gewinnen kannst.", "r": "Wort gehalten, Roman! Die Zuverlässigkeit war der Schlüssel. Feier schön! 🥂" }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Thilo Kerner (Sybit)",
+    "initial": "TK",
+    "color": "#01326F",
+    "sub": "Partnerschaft & Leidenschaft",
+    "initialMessages": [
+      "Morgen Roman! Die Performance-Daten sind top.",
+      "Musste an unsere ersten Workshops 2026 denken. Ohne diesen stabilen Backbone wäre die Skalierung nie so glatt gelaufen.",
+      "Danke, dass du mir diese Welt eröffnet hast! 🙏🚲"
+    ],
+    "options": [
+      { "t": "Danke Thilo! Ohne eure Hilfe wäre der Backbone ein Traum geblieben. Ausfahrt?", "r": "Absolut! Erst im Sattel habe ich verstanden, was eure Rider brauchen. Bis gleich! 🚴‍♂️" },
+      { "t": "Leidenschaft versteht man nur im Sattel. Schön, dass du dabei bist!", "r": "Wohl wahr! Das hat uns geholfen, den Backbone richtig zu bauen. Danke!" }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Shanghai Store",
+    "initial": "SH",
+    "color": "#3b82f6",
+    "sub": "Skalierung Asien",
+    "initialMessages": [
+      "Grüße aus Shanghai! 🇨🇳 MyCanyon ist der Wahnsinn.",
+      "Das Custom-Rad ist schneller beim Kunden als je zuvor.",
+      "Die Skalierung hier wäre ohne den neuen Backbone unmöglich gewesen."
+    ],
+    "options": [
+      { "t": "Shanghai ist der Schlüsselmarkt. Der Backbone war der Hebel.", "r": "Absolut! Die Daten fließen nahtlos. Wir sind unschlagbar." },
+      { "t": "Wie schmeckt der Kaffee im Store?", "r": "Gut, aber die Custom-Bikes sind heißer! ☕🔥" }
+    ]
+  }
+]

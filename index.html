@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Canyon Messenger 2036</title>
+    <style>
+        :root {
+            --bg-black: #000000;
+            --header-dark: #121212;
+            --text-white: #ffffff;
+            --text-gray: #8e8e93;
+            --accent-blue: #007aff;
+            --border-gray: #262626;
+            --message-bot: #1c1c1e;
+            --message-user: #007aff;
+            --action-button-bg: #01326F;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+        }
+
+        /* --- Intro Sequenz --- */
+        #intro-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-black); z-index: 1000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
+        }
+        #intro-overlay.active { display: flex; }
+        #intro-overlay.fade-out { opacity: 0; visibility: hidden; }
+
+        .intro-logo-container { width: 85%; max-width: 450px; margin-bottom: 30px; }
+        .intro-logo-container svg { width: 100%; height: auto; fill: white; }
+
+        .intro-text { font-size: 18px; color: var(--text-white); margin-bottom: 45px; font-weight: 300; letter-spacing: 1px; opacity: 0.8; }
+
+        .loader-container { width: 220px; height: 2px; background: #222; border-radius: 2px; overflow: hidden; }
+        .loader-bar { width: 0%; height: 100%; background: var(--text-white); transition: width 5s linear; }
+
+        /* --- App Layout --- */
+        .app-container { display: none; flex-direction: column; height: 100vh; position: relative; }
+        .app-container.visible { display: flex; }
+
+        header {
+            background-color: var(--bg-black);
+            padding: 15px 0;
+            text-align: center;
+            border-bottom: 0.5px solid var(--border-gray);
+            z-index: 10;
+        }
+        header .header-logo-svg { height: 18px; width: auto; fill: white; }
+
+        .view {
+            flex: 1; display: flex; flex-direction: column;
+            position: absolute; top: 55px; bottom: 80px; width: 100%;
+            background: var(--bg-black);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #listView { z-index: 5; opacity: 1; transform: scale(1); overflow-y: auto; }
+        #detailView { z-index: 6; transform: translateX(100%); opacity: 0; visibility: hidden; }
+        
+        .view-hidden { transform: scale(0.96); opacity: 0; pointer-events: none; }
+        .view-active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; }
+
+        /* Chat List */
+        .chat-item { display: flex; padding: 14px 16px; align-items: center; border-bottom: 0.5px solid var(--border-gray); cursor: pointer; }
+        .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; flex-shrink: 0; }
+        .chat-preview { flex: 1; min-width: 0; }
+        .chat-preview .name { display: block; font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+        .chat-preview .sub { color: var(--text-gray); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Detail View */
+        .chat-detail-header { padding: 10px 15px; background: var(--header-dark); display: flex; align-items: center; border-bottom: 0.5px solid var(--border-gray); }
+        .back-btn { font-size: 30px; color: var(--accent-blue); padding-right: 15px; cursor: pointer; }
+        .message-area { flex: 1; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+        
+        .msg-wrapper { display: flex; flex-direction: column; max-width: 85%; animation: msgIn 0.3s ease-out; margin-bottom: 2px; }
+        @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .bot { align-self: flex-start; }
+        .user { align-self: flex-end; }
+        .msg { padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; }
+        .bot .msg { background: var(--message-bot); }
+        .user .msg { background: var(--message-user); }
+        .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
+
+        /* Antwort-Buttons */
+        .mobile-actions { padding: 18px; background: var(--header-dark); display: flex; flex-direction: column; gap: 12px; border-top: 0.5px solid var(--border-gray); }
+        .action-card {
+            background-color: var(--action-button-bg); border: none; color: var(--text-white);
+            padding: 18px 20px; border-radius: 15px; font-size: 14.5px; font-weight: 500;
+            text-align: left; transition: opacity 0.2s, transform 0.1s; position: relative;
+            line-height: 1.35; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .action-card:active { opacity: 0.8; transform: scale(0.98); }
+        .action-card::after { content: "›"; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.4); font-size: 24px; font-weight: 300; }
+
+        .voice-bubble { background: var(--message-bot); padding: 12px; border-radius: 20px; display: flex; align-items: center; gap: 12px; min-width: 220px; cursor: pointer; }
+        .play-btn { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: none; font-size: 12px; }
+
+        .tab-bar { height: 80px; background-color: var(--header-dark); border-top: 0.5px solid var(--border-gray); display: flex; justify-content: space-around; align-items: center; padding-bottom: 20px; }
+        .tab-item { text-align: center; color: var(--text-gray); font-size: 10px; }
+        .tab-item.active { color: var(--text-white); }
+        .tab-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+        
+        .hidden { display: none; }
+        .typing { font-size: 12px; color: var(--text-gray); margin: 5px 0 0 15px; font-style: italic; }
+
+        /* Error Label */
+        #error-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #900; color:white; z-index:5000; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+    </style>
+</head>
+<body>
+
+<div id="error-overlay">
+    <h2>data.json nicht gefunden!</h2>
+    <p>Stelle sicher, dass data.json im selben Verzeichnis wie index.html liegt.</p>
+</div>
+
+<div id="intro-overlay">
+    <div class="intro-logo-container">
+        <svg version="1.1" viewBox="0 0 1024 144" xmlns="http://www.w3.org/2000/svg">
+            <path d="M25.395,1.187c-29.314,0-34.205,24.226-9.661,54.105l41.547,50.386c14.962,18.172,28.737,32.367,34.855,37.182 c0.169,0.129,0.336,0.18,0.582,0.18h42.101c-14.417-9.213-31.878-26.022-44.59-40.765L43.286,45.888 c-10.001-12.171-8.335-18.653,3.262-17.075c5.853,0.796,21.905,8.591,39.55,24.83h36.195C94.022,21.834,61.046,1.187,25.395,1.187"/>
+            <path d="M150.207,144.215h28.946c-1.413-11.015-6.277-23.98-16.313-36.063h-31.816C142.457,121.96,147.63,132.572,150.207,144.215"/>
+            <polyline points="635.381,105.377 589.001,4.065 560.189,4.065 594.771,73.428 593.829,73.418 501.408,4.065 460.456,4.065 605.27,111.18 633.093,144.188 668.105,144.188 635.381,105.377"/>
+            <polyline points="378.444,4.065 492.015,137.139 491.065,137.125 325.646,4.065 292.143,4.065 408.71,143.002 442.006,143.002 373.844,67.492 374.788,67.492 469.324,144.188 527.214,144.188 409.659,4.065 378.444,4.065"/>
+            <polyline points="875.228,4.065 988.803,137.139 987.853,137.125 822.423,4.065 788.905,4.065 905.503,143.002 938.777,143.002 871.859,67.492 871.569,67.492 966.105,144.188 1024,144.188 906.421,4.065 875.228,4.065"/>
+            <polyline points="163.511,4.065 235.119,143.008 264.936,143.008 210.593,41.637 211.512,41.637 316.461,144.188 354.064,144.188 207.5,4.065 163.511,4.065"/>
+            <path d="M740.176,102.202c12.736,14.765,30.229,31.595,44.652,40.8H742.68c-0.247,0-0.416-0.035-0.589-0.161 c-6.134-4.831-19.918-19.049-34.906-37.224l-41.587-50.439C641.017,25.257,645.919,1,675.264,1 c38.451,0,73.806,23.99,103.477,60.077l21.449,26.074c20.326,24.688,26.599,39.927,29.647,57.037h-27.56 c-2.594-11.646-7.771-22.271-19.208-36.092l-30.394-36.981c-23.372-28.343-48.561-41.403-56.249-42.449 c-11.586-1.572-13.254,4.914-3.254,17.099L740.176,102.202"/>
+        </svg>
+    </div>
+    <div class="intro-text">In einer nicht allzu fernen Zukunft...</div>
+    <div class="loader-container"><div id="loader-bar" class="loader-bar"></div></div>
+</div>
+
+<div id="app-main" class="app-container">
+    <header>
+        <div style="height: 18px; display: inline-block;">
+            <svg class="header-logo-svg" viewBox="0 0 1024 144" fill="white">
+                <path d="M25.395,1.187c-29.314,0-34.205,24.226-9.661,54.105l41.547,50.386c14.962,18.172,28.737,32.367,34.855,37.182 c0.169,0.129,0.336,0.18,0.582,0.18h42.101c-14.417-9.213-31.878-26.022-44.59-40.765L43.286,45.888 c-10.001-12.171-8.335-18.653,3.262-17.075c5.853,0.796,21.905,8.591,39.55,24.83h36.195C94.022,21.834,61.046,1.187,25.395,1.187"/>
+                <path d="M740.176,102.202c12.736,14.765,30.229,31.595,44.652,40.8H742.68c-0.247,0-0.416-0.035-0.589-0.161 c-6.134-4.831-19.918-19.049-34.906-37.224l-41.587-50.439C641.017,25.257,645.919,1,675.264,1 c38.451,0,73.806,23.99,103.477,60.077l21.449,26.074c20.326,24.688,26.599,39.927,29.647,57.037h-27.56 c-2.594-11.646-7.771-22.271-19.208-36.092l-30.394-36.981c-23.372-28.343-48.561-41.403-56.249-42.449 c-11.586-1.572-13.254,4.914-3.254,17.099L740.176,102.202"/>
+            </svg>
+        </div>
+    </header>
+
+    <div id="listView" class="view view-active"><div id="chat-list-content"></div></div>
+    <div id="detailView" class="view">
+        <div class="chat-detail-header"><span class="back-btn" onclick="closeChat()">‹</span>
+            <div id="detail-avatar" class="avatar" style="width:36px; height:36px; font-size:14px; margin-right:10px;"></div>
+            <strong id="detail-name">Partner</strong>
+        </div>
+        <div id="message-area" class="message-area"></div>
+        <div id="typing-box" class="typing hidden">schreibt...</div>
+        <div id="action-bar" class="mobile-actions hidden"></div>
+    </div>
+
+    <nav class="tab-bar">
+        <div class="tab-item"><span class="tab-icon">👤</span>Contacts</div>
+        <div class="tab-item"><span class="tab-icon">📞</span>Calls</div>
+        <div class="tab-item active"><span class="tab-icon">💬</span>Chats</div>
+        <div class="tab-item"><span class="tab-icon">⚙️</span>Settings</div>
+    </nav>
+</div>
+
+<audio id="voice-audio"></audio>
+
+<script>
+    let globalChatData = [];
+
+    // Automatisches Laden der JSON Datei (Optimiert für GitHub)
+    async function loadData() {
+        try {
+            const response = await fetch('data.json');
+            if (!response.ok) throw new Error();
+            globalChatData = await response.json();
+            startApp();
+        } catch (e) {
+            document.getElementById('error-overlay').style.display = 'flex';
+        }
+    }
+
+    function startApp() {
+        const intro = document.getElementById('intro-overlay');
+        intro.classList.add('active');
+        const bar = document.getElementById('loader-bar');
+        setTimeout(() => bar.style.width = '100%', 100);
+
+        setTimeout(() => {
+            intro.classList.add('fade-out');
+            document.getElementById('app-main').classList.add('visible');
+            buildChatList();
+            setTimeout(() => intro.style.display = 'none', 1200);
+        }, 5500);
+    }
+
+    function buildChatList() {
+        const list = document.getElementById('chat-list-content');
+        list.innerHTML = '';
+        globalChatData.forEach(chat => {
+            const item = document.createElement('div');
+            item.className = 'chat-item';
+            item.innerHTML = `
+                <div class="avatar" style="background:${chat.color}">${chat.initial}</div>
+                <div class="chat-preview"><span class="name">${chat.name}</span><span class="sub">${chat.isVoice ? '🎤 Sprachnachricht' : (chat.sub || '')}</span></div>
+            `;
+            item.onclick = () => openChat(chat);
+            list.appendChild(item);
+        });
+    }
+
+    async function openChat(chat) {
+        document.getElementById('listView').classList.add('view-hidden');
+        const detail = document.getElementById('detailView');
+        detail.style.display = 'flex';
+        setTimeout(() => detail.classList.add('view-active'), 50);
+        document.getElementById('detail-name').innerText = chat.name;
+        document.getElementById('detail-avatar').innerText = chat.initial;
+        document.getElementById('detail-avatar').style.background = chat.color;
+        
+        const area = document.getElementById('message-area');
+        const bar = document.getElementById('action-bar');
+        const typing = document.getElementById('typing-box');
+        area.innerHTML = ''; bar.innerHTML = ''; bar.classList.add('hidden');
+        
+        for (let i = 0; i < chat.initialMessages.length; i++) {
+            typing.classList.remove('hidden');
+            await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
+            typing.classList.add('hidden');
+            if(chat.isVoice && i === 0) addVoiceBubble(chat); else addMsg(chat.initialMessages[i], 'bot');
+            area.scrollTop = area.scrollHeight;
+        }
+        renderOptions(chat);
+    }
+
+    function renderOptions(chat) {
+        const bar = document.getElementById('action-bar');
+        bar.classList.remove('hidden');
+        chat.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'action-card';
+            btn.innerText = opt.t;
+            btn.onclick = () => {
+                addMsg(opt.t, 'user');
+                bar.classList.add('hidden');
+                document.getElementById('typing-box').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('typing-box').classList.add('hidden');
+                    addMsg(opt.r, 'bot');
+                }, 1000);
+            };
+            bar.appendChild(btn);
+        });
+    }
+
+    function addMsg(txt, type) {
+        const area = document.getElementById('message-area');
+        const wrapper = document.createElement('div');
+        wrapper.className = `msg-wrapper ${type}`;
+        wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">${new Date().getHours()}:${new Date().getMinutes().toString().padStart(2,'0')}</div>`;
+        area.appendChild(wrapper);
+        area.scrollTop = area.scrollHeight;
+    }
+
+    function addVoiceBubble(chat) {
+        const area = document.getElementById('message-area');
+        const wrapper = document.createElement('div');
+        wrapper.className = `msg-wrapper bot`;
+        wrapper.innerHTML = `<div class="voice-bubble" onclick="playVoice()"><button class="play-btn">▶</button><div style="flex:1; height:4px; background:#444; border-radius:2px;"></div><span style="font-size:11px;">0:14</span></div><div style="font-size:12px; margin-top:8px; color:var(--text-gray); font-style:italic;">"${chat.voiceTxt}"</div>`;
+        area.appendChild(wrapper);
+    }
+
+    function playVoice() {
+        const audio = document.getElementById('voice-audio');
+        audio.src = 'BDC.wav';
+        audio.play().catch(e => console.log("Audio-Play blockiert"));
+    }
+
+    function closeChat() {
+        document.getElementById('detailView').classList.remove('view-active');
+        setTimeout(() => { document.getElementById('detailView').style.display = 'none'; document.getElementById('listView').classList.remove('view-hidden'); }, 400);
+    }
+
+    // Start
+    loadData();
+</script>
+</body>
+</html>
