@@ -8,11 +8,39 @@
     "initialMessages": [
       "Hey Roman! 🌈 8 Titel... Wahnsinn.",
       "Ganz ehrlich: 2026 dachte ich nur: 'Lass mich einfach Radfahren'.",
-      "Aber heute weiß ich: Diese Ruhe im Hintergrund hat mir den Kopf freigemacht. Das Material war heute perfekt. Danke fürs Durchhalten! 🏆"
+      "Aber heute weiß ich: Diese Ruhe im Hintergrund hat mir den Kopf freigemacht. Der Backbone läuft einfach unsichtbar perfekt. Danke fürs Durchhalten! 🏆"
     ],
     "options": [
-      { "t": "Glückwunsch! 👑 Wir haben das Fundament gebaut, fliegen musstest du!", "r": "Genau das ist es. Im roten Bereich muss der Backbone einfach unsichtbar funktionieren. Bis bald! 🥂" },
-      { "t": "Wir haben die Prozesse 'unsichtbar' gemacht, damit du gewinnen kannst.", "r": "Wort gehalten, Roman! Die Zuverlässigkeit war der Schlüssel. Feier schön! 🥂" }
+      {
+        "t": "Glückwunsch! 👑 Wir haben das Fundament gebaut, fliegen musstest du!",
+        "r": "Genau das ist es. Im roten Bereich muss das System einfach unsichtbar funktionieren. Bis bald! 🥂"
+      },
+      {
+        "t": "Wir haben die Prozesse 'unsichtbar' gemacht, damit du gewinnen kannst.",
+        "r": "Wort gehalten, Roman! Die Zuverlässigkeit war der Schlüssel. Feier schön! 🥂"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "GBL Stratege",
+    "initial": "G",
+    "color": "#ef4444",
+    "sub": "10 Jahre Profit-Wende",
+    "initialMessages": [
+      "Glückwunsch zum 10-jährigen Jubiläum der 'Profit-Wende'! 🥂",
+      "Canyon ist heute die Cash-Machine im Portfolio.",
+      "Dank 'One Truth' im Backbone sehe ich alle Margen live. Kein Raten mehr. Beste Entscheidung damals!"
+    ],
+    "options": [
+      {
+        "t": "Die 'One Truth' hat uns gerettet. Wann feiern wir?",
+        "r": "Klassisch Roman! Ich schicke den Jet nach Koblenz! ✈️"
+      },
+      {
+        "t": "Zahlen sind gut, aber das Produkt muss stimmen.",
+        "r": "Genau die Kombi war unser Geheimnis. Du das Bike, wir die Zahlen. Deal? 🤝"
+      }
     ]
   },
   {
@@ -23,12 +51,106 @@
     "sub": "Partnerschaft & Leidenschaft",
     "initialMessages": [
       "Morgen Roman! Die Performance-Daten sind top.",
-      "Musste an unsere ersten Workshops 2026 denken. Ohne diesen stabilen Backbone wäre die Skalierung nie so glatt gelaufen.",
-      "Danke, dass du mir diese Welt eröffnet hast! 🙏🚲"
+      "Ohne den stabilen Backbone wäre die Skalierung nie so glatt gelaufen.",
+      "Danke, dass du mir diese Welt eröffnet hast – beruflich wie privat! 🙏🚲"
     ],
     "options": [
-      { "t": "Danke Thilo! Ohne eure Hilfe wäre der Backbone ein Traum geblieben. Ausfahrt?", "r": "Absolut! Erst im Sattel habe ich verstanden, was eure Rider brauchen. Bis gleich! 🚴‍♂️" },
-      { "t": "Leidenschaft versteht man nur im Sattel. Schön, dass du dabei bist!", "r": "Wohl wahr! Das hat uns geholfen, den Backbone richtig zu bauen. Danke!" }
+      {
+        "t": "Danke Thilo! Ohne eure Hilfe wäre der Backbone ein Traum geblieben. Ausfahrt?",
+        "r": "Absolut! Erst im Sattel habe ich verstanden, was eure Rider brauchen. Bis gleich! 🚴‍♂️"
+      },
+      {
+        "t": "Leidenschaft versteht man nur im Sattel. Schön, dass du dabei bist!",
+        "r": "Wohl wahr! Das hat uns geholfen, alles richtig zu bauen. Danke für das Vertrauen!"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Strategie-Team",
+    "initial": "ST",
+    "color": "#ec4899",
+    "sub": "🎤 Sprachnachricht (0:14)",
+    "isVoice": true,
+    "voiceTxt": "Hi Roman! WOW! Wie haben wir das früher ohne die Data Cloud gemacht? Unbezahlbar, so nah am Rider zu sein. Mega!",
+    "initialMessages": [
+      "🎤 Sprachnachricht empfangen"
+    ],
+    "options": [
+      {
+        "t": "Data is the new steel! 🦾 Wie ist die Conversion?",
+        "r": "Über 25% Plus dank der neuen Struktur! 📈"
+      },
+      {
+        "t": "Freut mich! Unsere Rider spüren die Leidenschaft.",
+        "r": "Absolut! Wir haben jetzt endlich Zeit für echte Geschichten. ✨"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "LeBron James",
+    "initial": "LJ",
+    "color": "#f59e0b",
+    "sub": "LBJ Legacy Bike",
+    "initialMessages": [
+      "Yo Roman! 🏀 Das neue 'LBJ Legacy Bike' ist live.",
+      "500k User gleichzeitig und der Backbone hat nicht mal gezuckt. 100% Uptime!",
+      "Die US-Expansion läuft von selbst. Big Win!"
+    ],
+    "options": [
+      {
+        "t": "King James! 👑 100% Uptime ist der neue Standard.",
+        "r": "Wichtigster Assist meiner Karriere! Stay legendary! 🦾"
+      },
+      {
+        "t": "Hoffe du fährst das Bike auch fleißig?",
+        "r": "50 Meilen heute Morgen! Fitness ist alles. 🚲"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Mechaniker (Montage)",
+    "initial": "M",
+    "color": "#10b981",
+    "sub": "Clean Core Feedback",
+    "initialMessages": [
+      "Hey Roman, der 'Clean Core' macht echt einen Unterschied.",
+      "Kein System-Chaos mehr. Jedes Teil ist da, wo es sein soll.",
+      "Wir bauen wieder Räder für Rider, nicht gegen den Computer. Agilität!"
+    ],
+    "options": [
+      {
+        "t": "Das hört man gern. Agilität > Hierarchie.",
+        "r": "Genau! 'Pure Cycling' bis in die letzte Schraube."
+      },
+      {
+        "t": "Läuft die Testmaschine im Prüflabor noch rund?",
+        "r": "Die glüht! 🔥 Dank Daten wissen wir schon beim Bau, was hält."
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Sarah (Community)",
+    "initial": "S",
+    "color": "#8b5cf6",
+    "sub": "NPS Rekord",
+    "initialMessages": [
+      "Roman! NPS auf Rekordhoch. 📈",
+      "KI löst Standard-Sachen und wir haben Zeit für echte Geschichten.",
+      "Feedback bleibt unser Breakfast! 🥐"
+    ],
+    "options": [
+      {
+        "t": "Breakfast of Champions! Schick mir Montag die kritischen Stimmen.",
+        "r": "Keine Sorge, die Montags-Runde bleibt heilig. 😉"
+      },
+      {
+        "t": "FCR-Rekord? Zeit für die nächste Innovation!",
+        "r": "Genau! Wir packen Probleme jetzt an der Wurzel. 🚀"
+      }
     ]
   },
   {
@@ -40,11 +162,127 @@
     "initialMessages": [
       "Grüße aus Shanghai! 🇨🇳 MyCanyon ist der Wahnsinn.",
       "Das Custom-Rad ist schneller beim Kunden als je zuvor.",
-      "Die Skalierung hier wäre ohne den neuen Backbone unmöglich gewesen."
+      "Die Skalierung wäre ohne diesen Backbone unmöglich gewesen."
     ],
     "options": [
-      { "t": "Shanghai ist der Schlüsselmarkt. Der Backbone war der Hebel.", "r": "Absolut! Die Daten fließen nahtlos. Wir sind unschlagbar." },
-      { "t": "Wie schmeckt der Kaffee im Store?", "r": "Gut, aber die Custom-Bikes sind heißer! ☕🔥" }
+      {
+        "t": "Shanghai ist ein Schlüsselmarkt. Der Backbone war der Hebel.",
+        "r": "Absolut! Die Daten fließen nahtlos. Wir sind unschlagbar."
+      },
+      {
+        "t": "Wie schmeckt der Kaffee im Store?",
+        "r": "Gut, aber die Custom-Bikes sind heißer! ☕🔥"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "CFO",
+    "initial": "CF",
+    "color": "#64748b",
+    "sub": "TCO & Margen",
+    "initialMessages": [
+      "Morgen Roman. TCO auf Rekordtief. 📉",
+      "15 Altsysteme weg. Geld fließt direkt in die neue F&E.",
+      "So macht Sparen Spaß!"
+    ],
+    "options": [
+      {
+        "t": "Weniger Silos = mehr Freiheit für Entwicklung.",
+        "r": "Der operative Hebel durch den Backbone ist gewaltig! 📈"
+      },
+      {
+        "t": "TCO gesenkt? Dann direkt in die US-Logistik investieren.",
+        "r": "Gute Entscheidung, ich bereite die Budgets vor."
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Stammkunde",
+    "initial": "R",
+    "color": "#94a3b8",
+    "sub": "Neues Aeroad",
+    "initialMessages": [
+      "Hi Roman, mein neues Aeroad kam an. Ihr lest Gedanken!",
+      "Größe und Übersetzung passen perfekt. Das ist Freundschaft.",
+      "Danke für die Treue!"
+    ],
+    "options": [
+      {
+        "t": "Genau das war der Plan: Ein System, das den Rider kennt.",
+        "r": "Beratung wie früher in der Garage – nur digital. 📸"
+      },
+      {
+        "t": "Freut mich! Schick mir mal ein Foto.",
+        "r": "Ist unterwegs! Ein Traum in Carbon. ✨"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "name": "IG Metall",
+    "initial": "IG",
+    "color": "#ef4444",
+    "sub": "Belegschaft",
+    "initialMessages": [
+      "Herr Arnold, wir sind wieder über 2.000 Leute.",
+      "Diesmal gesund gewachsen. Die Tools funktionieren einfach.",
+      "Ein faires Stück Arbeit!"
+    ],
+    "options": [
+      {
+        "t": "Wachstum geht nur gemeinsam. Die 'Familie' ist riesig.",
+        "r": "Absolut. Auf die nächsten 10 Jahre! 🤝"
+      },
+      {
+        "t": "Effizienz war nötig, um die Jobs langfristig zu sichern.",
+        "r": "Das Ergebnis gibt Ihnen recht. Ein starkes Signal!"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Nicholas (ex-CEO)",
+    "initial": "N",
+    "color": "#f8fafc",
+    "sub": "Digitaler F1",
+    "initialMessages": [
+      "Roman, Respekt. Du hast es geschafft.",
+      "Gründer-Intuition gepaart mit einem Weltklasse-System.",
+      "Canyon hat jetzt einen Backbone wie ein Formel-1-Wagen."
+    ],
+    "options": [
+      {
+        "t": "Danke Nicholas. Dein Nike-Input hat geholfen.",
+        "r": "Du hast die Seele bewahrt und ihr einen Körper gegeben."
+      },
+      {
+        "t": "Ich musste erst lernen: Agilität braucht einen Backbone.",
+        "r": "Ein wahres Wort. Das Ergebnis ist das Lehrstück!"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "name": "Tochter",
+    "initial": "A",
+    "color": "#ec4899",
+    "sub": "Gravel Event",
+    "initialMessages": [
+      "Papa, das Event ist Wahnsinn! 1.000 Leute vernetzt per App.",
+      "Es fühlt sich alles so leicht und 'Pure' an.",
+      "Du hast Canyon für uns neu erfunden. Stolz auf dich! ❤️"
+    ],
+    "options": [
+      {
+        "t": "Pure Cycling ist ein Lebensgefühl. Hab Spaß!",
+        "r": "Die anderen schauen nur neidisch rüber! Bis heute Abend! 🚴‍♀️"
+      },
+      {
+        "t": "Haben die anderen auch so coole Apps?",
+        "r": "Keine Chance. Wir haben das beste Erlebnis! 😉"
+      }
     ]
   }
 ]
