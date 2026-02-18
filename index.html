@@ -35,10 +35,8 @@
         }
         #intro-overlay.active { display: flex; }
         #intro-overlay.fade-out { opacity: 0; visibility: hidden; }
-
         .logo-container { width: 80%; max-width: 450px; margin-bottom: 30px; }
         .canyon-svg { fill: white; width: 100%; height: auto; display: block; }
-
         .intro-text { font-size: 18px; color: var(--text-white); margin-bottom: 45px; font-weight: 300; letter-spacing: 1px; opacity: 0.8; }
         .loader-container { width: 220px; height: 2px; background: #222; border-radius: 2px; overflow: hidden; }
         .loader-bar { width: 0%; height: 100%; background: var(--text-white); transition: width 5s linear; }
@@ -59,7 +57,6 @@
         .header-logo-container { height: 18px; width: auto; }
         .header-logo-container svg { height: 100%; width: auto; fill: white; display: block; }
 
-        /* Navigation Views */
         .view {
             flex: 1; display: flex; flex-direction: column;
             position: absolute; top: 55px; bottom: 80px; width: 100%;
@@ -92,22 +89,24 @@
         .user .msg { background: var(--message-user); }
         .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
 
-        /* Action Buttons */
+        /* Antwort-Buttons */
         .mobile-actions { padding: 18px; background: var(--header-dark); display: flex; flex-direction: column; gap: 12px; border-top: 0.5px solid var(--border-gray); }
         .action-card {
             background-color: var(--action-button-bg); border: none; color: var(--text-white);
-            padding: 18px 20px; border-radius: 15px; font-size: 14.5px; font-weight: 500;
+            padding: 20px; border-radius: 15px; font-size: 14.5px; font-weight: 500;
             text-align: left; transition: opacity 0.2s, transform 0.1s; position: relative;
             line-height: 1.35; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-        .action-card:active { opacity: 0.8; transform: scale(0.98); }
+        .action-card:active { opacity: 0.85; transform: scale(0.98); }
         .action-card::after { 
             content: "›"; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); 
             color: rgba(255, 255, 255, 0.4); font-size: 24px; font-weight: 300;
         }
 
+        /* Voice Bubble mit Pause-Logik */
         .voice-bubble { background: var(--message-bot); padding: 12px; border-radius: 20px; display: flex; align-items: center; gap: 12px; min-width: 220px; cursor: pointer; }
-        .play-btn { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: none; font-size: 12px; }
+        .play-btn { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: none; font-size: 14px; transition: transform 0.1s; }
+        .play-btn:active { transform: scale(0.9); }
 
         .tab-bar { height: 80px; background-color: var(--header-dark); border-top: 0.5px solid var(--border-gray); display: flex; justify-content: space-around; align-items: center; padding-bottom: 20px; }
         .tab-item { text-align: center; color: var(--text-gray); font-size: 10px; }
@@ -116,9 +115,7 @@
         .hidden { display: none; }
         .typing { font-size: 12px; color: var(--text-gray); margin: 5px 0 0 15px; font-style: italic; }
 
-        /* Error Message */
         #error-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; color:white; z-index:5000; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
-        .retry-btn { margin-top:20px; background:#444; border:none; color:white; padding:10px 20px; border-radius:5px; cursor:pointer;}
     </style>
 </head>
 <body>
@@ -126,8 +123,7 @@
 <div id="error-overlay">
     <div style="font-size: 40px; margin-bottom: 20px;">⚠️</div>
     <h3>data.json nicht gefunden</h3>
-    <p style="color: var(--text-gray); max-width: 300px;">Stellen Sie sicher, dass data.json im Hauptverzeichnis auf GitHub liegt.</p>
-    <button class="retry-btn" onclick="location.reload()">Erneut versuchen</button>
+    <button onclick="location.reload()" style="margin-top:20px; background:#444; border:none; color:white; padding:10px 20px; border-radius:5px;">Retry</button>
 </div>
 
 <div id="intro-overlay">
@@ -184,8 +180,9 @@
 
 <script>
     let globalChatData = [];
+    const audioPlayer = document.getElementById('voice-audio');
 
-    // Automatisches Laden (GitHub / Webserver)
+    // Automatisches Laden (Server)
     async function loadData() {
         try {
             const response = await fetch('data.json');
@@ -283,19 +280,49 @@
         const area = document.getElementById('message-area');
         const wrapper = document.createElement('div');
         wrapper.className = `msg-wrapper bot`;
-        wrapper.innerHTML = `<div class="voice-bubble" onclick="playVoice()"><button class="play-btn">▶</button><div style="flex:1; height:4px; background:#444; border-radius:2px;"></div><span style="font-size:11px;">0:14</span></div><div style="font-size:12px; margin-top:8px; color:var(--text-gray); font-style:italic;">"${chat.voiceTxt}"</div>`;
+        wrapper.innerHTML = `
+            <div class="voice-bubble" onclick="toggleAudio(this)">
+                <button class="play-btn">▶</button>
+                <div style="flex:1; height:4px; background:#444; border-radius:2px; position:relative;">
+                    <div id="audio-progress" style="position:absolute; height:100%; width:0%; background:var(--accent-blue);"></div>
+                </div>
+                <span style="font-size:11px;">0:14</span>
+            </div>
+            <div style="font-size:12px; margin-top:8px; color:var(--text-gray); font-style:italic;">"${chat.voiceTxt}"</div>
+        `;
         area.appendChild(wrapper);
+
+        // Audio Event Listener für automatischen Reset am Ende
+        audioPlayer.onended = () => {
+            const btn = document.querySelector('.play-btn');
+            if(btn) btn.innerText = '▶';
+        };
     }
 
-    function playVoice() {
-        const audio = document.getElementById('voice-audio');
-        audio.src = 'BDC.wav';
-        audio.play().catch(e => console.log("Audio-Play blockiert"));
+    function toggleAudio(container) {
+        const btn = container.querySelector('.play-btn');
+        
+        if (audioPlayer.paused) {
+            audioPlayer.src = 'BDC.wav';
+            audioPlayer.play().then(() => {
+                btn.innerText = '⏸';
+            }).catch(e => console.log("Audio Play blockiert"));
+        } else {
+            audioPlayer.pause();
+            btn.innerText = '▶';
+        }
     }
 
     function closeChat() {
+        // Audio stoppen, wenn Roman den Chat verlässt
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+        
         document.getElementById('detailView').classList.remove('view-active');
-        setTimeout(() => { document.getElementById('detailView').style.display = 'none'; document.getElementById('listView').classList.remove('view-hidden'); }, 400);
+        setTimeout(() => { 
+            document.getElementById('detailView').style.display = 'none'; 
+            document.getElementById('listView').classList.remove('view-hidden'); 
+        }, 400);
     }
 
     // Start
