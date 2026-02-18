@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Canyon Messenger 2036</title>
+    <title>Canyon Messenger 2029</title>
     <style>
         :root {
             --bg-black: #000000;
@@ -221,12 +221,12 @@
         });
     }
 
-    // Hilfsfunktion für den 2036er Zeitstempel
-    function getTimestamp2036() {
+    // Hilfsfunktion für den 2029er Zeitstempel
+    function getTimestamp2029() {
         const now = new Date();
         const hrs = now.getHours().toString().padStart(2, '0');
         const min = now.getMinutes().toString().padStart(2, '0');
-        return `${hrs}:${min} (18.02.2036)`;
+        return `${hrs}:${min} (18.02.2029)`;
     }
 
     async function openChat(chat) {
@@ -277,7 +277,7 @@
         const area = document.getElementById('message-area');
         const wrapper = document.createElement('div');
         wrapper.className = `msg-wrapper ${type}`;
-        wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">${getTimestamp2036()}</div>`;
+        wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">${getTimestamp2029()}</div>`;
         area.appendChild(wrapper);
         area.scrollTop = area.scrollHeight;
     }
