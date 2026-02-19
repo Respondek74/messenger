@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Canyon Messenger 2036</title>
+    <style>
+        :root {
+            --bg-black: #000000;
+            --header-dark: #121212;
+            --text-white: #ffffff;
+            --text-gray: #8e8e93;
+            --accent-blue: #007aff;
+            --border-gray: #262626;
+            --message-bot: #1c1c1e;
+            --message-user: #007aff;
+            --input-bg: #1c1c1e;
+            --canyon-dark-blue: #01326F;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+        }
+
+        /* --- Overlays --- */
+        #intro-overlay, #browser-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1000; display: none; flex-direction: column;
+        }
+        #intro-overlay {
+            background-color: var(--bg-black); align-items: center; justify-content: center;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
+        }
+        #intro-overlay.active { display: flex; }
+        #intro-overlay.fade-out { opacity: 0; visibility: hidden; }
+
+        #browser-overlay {
+            background: white; z-index: 2000;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        #browser-iframe { width: 100%; flex: 1; border: none; }
+        .close-overlay-btn {
+            position: absolute; top: 20px; right: 20px;
+            width: 40px; height: 40px; background: rgba(0,0,0,0.5);
+            color: white; border-radius: 50%; border: none; font-size: 24px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 2100; backdrop-filter: blur(5px);
+        }
+
+        .logo-container { width: 80%; max-width: 450px; margin-bottom: 30px; }
+        .canyon-svg { fill: white; width: 100%; height: auto; display: block; }
+        .intro-text { font-size: 18px; color: var(--text-white); margin-bottom: 45px; font-weight: 300; letter-spacing: 1px; opacity: 0.8; }
+        .loader-container { width: 220px; height: 2px; background: #222; border-radius: 2px; overflow: hidden; }
+        .loader-bar { width: 0%; height: 100%; background: var(--text-white); transition: width 5s linear; }
+
+        /* --- App Layout --- */
+        .app-container { display: flex; flex-direction: column; height: 100vh; position: relative; visibility: hidden; }
+        .app-container.visible { visibility: visible; }
+
+        header {
+            background-color: var(--bg-black);
+            padding: 15px 0; border-bottom: 0.5px solid var(--border-gray);
+            z-index: 10; display: flex; justify-content: center; align-items: center;
+        }
+        .header-logo-container { height: 18px; width: auto; }
+        .header-logo-container svg { height: 100%; width: auto; fill: white; display: block; }
+
+        .view {
+            flex: 1; display: flex; flex-direction: column;
+            position: absolute; top: 55px; bottom: 80px; width: 100%;
+            background: var(--bg-black);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #listView { z-index: 5; opacity: 1; transform: scale(1); overflow-y: auto; }
+        #detailView { z-index: 6; transform: translateX(100%); opacity: 0; visibility: hidden; }
+        .view-hidden { transform: scale(0.96); opacity: 0; pointer-events: none; }
+        .view-active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; }
+
+        /* Chat List Item */
+        .chat-item { display: flex; padding: 14px 16px; align-items: center; border-bottom: 0.5px solid var(--border-gray); cursor: pointer; }
+        .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; flex-shrink: 0; }
+        .chat-preview { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .chat-preview-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+        .chat-preview .name { font-weight: 600; font-size: 16px; color: var(--text-white); }
+        .chat-list-time { font-size: 12px; color: var(--text-gray); white-space: nowrap; margin-left: 10px; }
+        .chat-preview .sub { color: var(--text-gray); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Detail View UI */
+        .chat-detail-header { padding: 10px 15px; background: var(--header-dark); display: flex; align-items: center; border-bottom: 0.5px solid var(--border-gray); }
+        .back-btn { font-size: 30px; color: var(--accent-blue); padding-right: 15px; cursor: pointer; }
+        .message-area { flex: 1; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-bottom: 30px; }
+        
+        .msg-wrapper { display: flex; flex-direction: column; max-width: 85%; animation: msgIn 0.3s ease-out; margin-bottom: 2px; }
+        @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .bot { align-self: flex-start; }
+        .user { align-self: flex-end; }
+        .msg { padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; }
+        .bot .msg { background: var(--message-bot); }
+        .user .msg { background: var(--message-user); }
+        .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
+
+        /* Media Card */
+        .media-card {
+            background: var(--message-bot); border-radius: 12px; overflow: hidden;
+            margin: 5px 0; border: 0.5px solid var(--border-gray); max-width: 280px;
+            cursor: pointer;
+        }
+        .media-img { width: 100%; height: 160px; background: #f2e6e6 url('ft-cover.jpg') no-repeat center center; background-size: cover; }
+        .media-info { padding: 12px; font-size: 13px; line-height: 1.4; }
+        .media-source { font-size: 10px; color: var(--text-gray); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.5px;}
+
+        /* Input Area */
+        .input-area {
+            background: var(--header-dark); padding: 10px 15px 35px 15px;
+            border-top: 0.5px solid var(--border-gray); display: flex; align-items: center; gap: 10px;
+        }
+        .input-field-container { flex: 1; background: var(--input-bg); border-radius: 22px; padding: 10px 18px; display: flex; align-items: center; }
+        .input-field { border: none; background: transparent; color: var(--text-white); font-size: 15px; width: 100%; outline: none; }
+        .send-btn { width: 36px; height: 36px; background: var(--accent-blue); border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .send-btn:disabled { opacity: 0.3; }
+        .send-btn svg { fill: white; width: 20px; height: 20px; }
+
+        .tab-bar { height: 80px; background-color: var(--header-dark); border-top: 0.5px solid var(--border-gray); display: flex; justify-content: space-around; align-items: center; padding-bottom: 20px; }
+        .tab-item { text-align: center; color: var(--text-gray); font-size: 10px; }
+        .tab-item.active { color: var(--text-white); }
+        .tab-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+        .hidden { display: none; }
+        .typing { font-size: 12px; color: var(--text-gray); margin: 5px 0 0 15px; font-style: italic; }
+
+        .voice-bubble { background: var(--message-bot); padding: 12px; border-radius: 20px; display: flex; align-items: center; gap: 12px; min-width: 220px; cursor: pointer; }
+        .play-btn-circle { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div id="browser-overlay">
+    <button class="close-overlay-btn" onclick="closeOverlay()">✕</button>
+    <iframe id="browser-iframe" src=""></iframe>
+</div>
+
+<div id="intro-overlay">
+    <div class="logo-container">
+        <svg version="1.1" class="canyon-svg" viewBox="0 0 1024 144" xmlns="http://www.w3.org/2000/svg"><path d="M25.395,1.187c-29.314,0-34.205,24.226-9.661,54.105l41.547,50.386c14.962,18.172,28.737,32.367,34.855,37.182 c0.169,0.129,0.336,0.18,0.582,0.18h42.101c-14.417-9.213-31.878-26.022-44.59-40.765L43.286,45.888 c-10.001-12.171-8.335-18.653,3.262-17.075c5.853,0.796,21.905,8.591,39.55,24.83h36.195C94.022,21.834,61.046,1.187,25.395,1.187"/><path d="M150.207,144.215h28.946c-1.413-11.015-6.277-23.98-16.313-36.063h-31.816C142.457,121.96,147.63,132.572,150.207,144.215"/><polyline points="635.381,105.377 589.001,4.065 560.189,4.065 594.771,73.428 593.829,73.418 501.408,4.065 460.456,4.065 605.27,111.18 633.093,144.188 668.105,144.188 635.381,105.377"/><polyline points="378.444,4.065 492.015,137.139 491.065,137.125 325.646,4.065 292.143,4.065 408.71,143.002 442.006,143.002 373.844,67.492 374.788,67.492 469.324,144.188 527.214,144.188 409.659,4.065 378.444,4.065"/><polyline points="875.228,4.065 988.803,137.139 987.853,137.125 822.423,4.065 788.905,4.065 905.503,143.002 938.777,143.002 871.859,67.492 871.569,67.492 966.105,144.188 1024,144.188 906.421,4.065 875.228,4.065"/><polyline points="163.511,4.065 235.119,143.008 264.936,143.008 210.593,41.637 211.512,41.637 316.461,144.188 354.064,144.188 207.5,4.065 163.511,4.065"/><path d="M740.176,102.202c12.736,14.765,30.229,31.595,44.652,40.8H742.68c-0.247,0-0.416-0.035-0.589-0.161 c-6.134-4.831-19.918-19.049-34.906-37.224l-41.587-50.439C641.017,25.257,645.919,1,675.264,1 c38.451,0,73.806,23.99,103.477,60.077l21.449,26.074c20.326,24.688,26.599,39.927,29.647,57.037h-27.56 c-2.594-11.646-7.771-22.271-19.208-36.092l-30.394-36.981c-23.372-28.343-48.561-41.403-56.249-42.449 c-11.586-1.572-13.254,4.914-3.254,17.099L740.176,102.202"/></svg>
+    </div>
+    <div class="intro-text">In einer nicht allzu fernen Zukunft...</div>
+    <div class="loader-container"><div id="loader-bar" class="loader-bar"></div></div>
+</div>
+
+<div id="app-container" class="app-container">
+    <header>
+        <div class="header-logo-container">
+            <svg version="1.1" viewBox="0 0 1024 144" xmlns="http://www.w3.org/2000/svg"><path d="M25.395,1.187c-29.314,0-34.205,24.226-9.661,54.105l41.547,50.386c14.962,18.172,28.737,32.367,34.855,37.182 c0.169,0.129,0.336,0.18,0.582,0.18h42.101c-14.417-9.213-31.878-26.022-44.59-40.765L43.286,45.888 c-10.001-12.171-8.335-18.653,3.262-17.075c5.853,0.796,21.905,8.591,39.55,24.83h36.195C94.022,21.834,61.046,1.187,25.395,1.187"/><path d="M150.207,144.215h28.946c-1.413-11.015-6.277-23.98-16.313-36.063h-31.816C142.457,121.96,147.63,132.572,150.207,144.215"/><polyline points="635.381,105.377 589.001,4.065 560.189,4.065 594.771,73.428 593.829,73.418 501.408,4.065 460.456,4.065 605.27,111.18 633.093,144.188 668.105,144.188 635.381,105.377"/><polyline points="378.444,4.065 492.015,137.139 491.065,137.125 325.646,4.065 292.143,4.065 408.71,143.002 442.006,143.002 373.844,67.492 374.788,67.492 469.324,144.188 527.214,144.188 409.659,4.065 378.444,4.065"/><polyline points="875.228,4.065 988.803,137.139 987.853,137.125 822.423,4.065 788.905,4.065 905.503,143.002 938.777,143.002 871.859,67.492 871.569,67.492 966.105,144.188 1024,144.188 906.421,4.065 875.228,4.065"/><polyline points="163.511,4.065 235.119,143.008 264.936,143.008 210.593,41.637 211.512,41.637 316.461,144.188 354.064,144.188 207.5,4.065 163.511,4.065"/><path d="M740.176,102.202c12.736,14.765,30.229,31.595,44.652,40.8H742.68c-0.247,0-0.416-0.035-0.589-0.161 c-6.134-4.831-19.918-19.049-34.906-37.224l-41.587-50.439C641.017,25.257,645.919,1,675.264,1 c38.451,0,73.806,23.99,103.477,60.077l21.449,26.074c20.326,24.688,26.599,39.927,29.647,57.037h-27.56 c-2.594-11.646-7.771-22.271-19.208-36.092l-30.394-36.981c-23.372-28.343-48.561-41.403-56.249-42.449 c-11.586-1.572-13.254,4.914-3.254,17.099L740.176,102.202"/></svg>
+        </div>
+    </header>
+
+    <div id="listView" class="view view-active"><div id="chat-list-content"></div></div>
+    
+    <div id="detailView" class="view">
+        <div class="chat-detail-header">
+            <span class="back-btn" onclick="closeChat()">‹</span>
+            <div id="detail-avatar" class="avatar" style="width:36px; height:36px; font-size:14px; margin-right:10px;"></div>
+            <strong id="detail-name">Partner</strong>
+        </div>
+        <div id="message-area" class="message-area"></div>
+        <div id="typing-box" class="typing hidden">schreibt...</div>
+        
+        <div class="input-area">
+            <div class="input-field-container">
+                <input type="text" id="chat-input" class="input-field" readonly placeholder="Antwort...">
+            </div>
+            <button id="send-btn" class="send-btn" disabled>
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <nav class="tab-bar">
+        <div class="tab-item"><span class="tab-icon">👤</span>Contacts</div>
+        <div class="tab-item"><span class="tab-icon">📞</span>Calls</div>
+        <div class="tab-item active"><span class="tab-icon">💬</span>Chats</div>
+        <div class="tab-item"><span class="tab-icon">⚙️</span>Settings</div>
+    </nav>
+</div>
+
+<audio id="voice-audio"></audio>
+
+<script>
+    const chatData = [
+      {
+        "id": 1, "name": "Mathieu", "initial": "M", "color": "#ffffff", "textColor": "#01326F", "sub": "Unser Weltmeister 🌈",
+        "initialMessages": [
+          "Hey Roman! 🌈 Nächster Titel... Wahnsinn.",
+          "Danke für eure Innovationen der letzen Jahre. Es macht mich so stolz ein Gesicht des Canyon-Teams zu sein.",
+          "Meine Vielseitigkeit, eure Performance - unschlagbar! 🏆"
+        ],
+        "options": [{ "t": "Glückwunsch! 👑 Wir haben das Fundament gebaut, fliegen musstest du!", "r": "Tolle Teamleistung der Canyon-Familie. Bis bald! 🥂" }]
+      },
+      {
+        "id": 2, "name": "GBL Stratege", "initial": "GS", "color": "#ef4444", "sub": "Turn-Around",
+        "initialMessages": [
+          "Glückwunsch zum Turn-Around! 🥂",
+          "Die Entscheidungen in 2026 waren genau richtig - der Invest zahlt sich nun aus.",
+          "Press: Financial Times (Picture embedded) - Headline: Canyon verdoppelt den Unternehmenswert in 4 Jahren."
+        ],
+        "options": [{ "t": "Danke für euren Support in schwierigen Zeiten!", "r": "Canyon ist wieder Top 3 in unserem Portfolio! Lass uns diesen Weg gemeinsam weitergehen!" }]
+      },
+      {
+        "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#01326F", "sub": "We Create CX Champions",
+        "initialMessages": [
+          "Morgen Roman! Ich bin richtig stolz darauf, was wir gemeinsam geschaffen haben.",
+          "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute Ergebnisse erzielt."
+        ],
+        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir unseren Datenschatz gehoben.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Meine Nummer hast du ja (+49 1752 957364)" }]
+      },
+      {
+        "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "isVoice": true,
+        "voiceTxt": "Hi Roman! WOW! Wie haben wir das früher ohne die SAP Data Platform gemacht? Unbezahlbar, so nah am Rider zu sein. Mega!",
+        "initialMessages": ["🎤 Sprachnachricht empfangen"],
+        "options": [{ "t": "Data is king! 🦾 Wie hat sich der Customer Lifetime Value entwickelt?", "r": "Über 25% gestiegen dank unserer Fokussierung 2026! 📈 Unsere Rider spüren die Leidenschaft. Echte Loyalität!" }]
+      },
+      {
+        "id": 5, "name": "LeBron James", "initial": "LJ", "color": "#f59e0b", "sub": "LBJ Legacy Bike",
+        "initialMessages": ["Yo Roman! 🏀 R126 has gone live! The campaign is on point in the US, sales is skyrocketing!"],
+        "options": [{ "t": "King James! 👑 Fantastic! Our approach to understand our riders even better takes off! I'm proud.", "r": "Me too, Roman. Wanna join me on a ride in LA together with Mark Allen?" }]
+      },
+      {
+        "id": 6, "name": "Rad Race", "initial": "RR", "color": "#10b981", "sub": "Best Canyon Service",
+        "initialMessages": [
+          "Hey Roman, mega, was ihr mit dem Neustart der Service Plattform erreicht habt!",
+          "Es macht richtig Spaß mit euch zu arbeiten, weil wir immer top informiert sind über Rider und Bikes."
+        ],
+        "options": [{ "t": "Super, freut mich, dass ihr mit Canyon wachsen könnt. Ihr seid für uns ein wichtiger Erfolgsfaktor!", "r": "'Pure Cycling' bis in die letzte Schraube. Gerne zeige ich dir unsere neue Werkstatt in München." }]
+      },
+      {
+        "id": 7, "name": "Sarah", "initial": "S", "color": "#8b5cf6", "sub": "Community Managerin",
+        "initialMessages": ["Roman! NPS auf Rekordhoch. 📈", "KI löst Standard-Themen und wir haben Zeit für echte Geschichten.", "Feedback bleibt unser wichtigster Input!"],
+        "options": [{ "t": "Genau, also wie immer: Schick mir Montag die kritischen Stimmen.", "r": "Keine Sorge, die Montags-Runde bleibt heilig. 😉" }]
+      },
+      {
+        "id": 8, "name": "Shanghai Store", "initial": "SH", "color": "#3b82f6", "sub": "Skalierung Asien",
+        "initialMessages": ["Grüße aus Shanghai! 🇨🇳 MyCanyon ist der Wahnsinn.", "Das Custom-Rad ist schneller beim Kunden als je zuvor.", "Die neuen Systeme haben unsere Skalierung erst möglich gemacht."],
+        "options": [{ "t": "Shanghai ist ein Schlüsselmarkt. Der Backbone war ein wichtiger Hebel.", "r": "Absolut! War die beste Entscheidung der letzten Jahre. Wir sind unschlagbar." }]
+      },
+      {
+        "id": 9, "name": "CFO", "initial": "CF", "color": "#64748b", "sub": "TCO & Margen",
+        "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉", "15 Altsysteme weg. Geld fließt direkt in die neue F&E.", "So macht Optimieren Spaß!"],
+        "options": [{ "t": "Weniger Silos = mehr Freiheit für Entwicklung. Enormes Potenzial.", "r": "Ich hab's dir immer gesagt. 📈 Wie immer? Abendrunde Mittwoch 18 Uhr?" }]
+      },
+      {
+        "id": 10, "name": "Stammkunde", "initial": "R", "color": "#94a3b8", "sub": "Neues Aeroad",
+        "initialMessages": ["Hi Roman, mein neues Aeroad kam an. Euer Bike Fitting Service begeistert!", "Stack und Reach passen perfekt. Das ist Perfektion."],
+        "options": [{ "t": "Genau das war der Plan: Ein System, das den Rider perfekt kennt. Danke!", "r": "Beratung wie früher in der Garage – nur digital. 📸" }]
+      }
+    ];
+
+    const audioPlayer = document.getElementById('voice-audio');
+
+    function getTimestamp() {
+        const now = new Date();
+        const hrs = now.getHours().toString().padStart(2, '0');
+        const min = now.getMinutes().toString().padStart(2, '0');
+        return `${hrs}:${min} (18.02.2036)`;
+    }
+
+    function startApp() {
+        const intro = document.getElementById('intro-overlay');
+        const bar = document.getElementById('loader-bar');
+        intro.classList.add('active');
+        setTimeout(() => bar.style.width = '100%', 100);
+        setTimeout(() => {
+            intro.classList.add('fade-out');
+            document.getElementById('app-container').classList.add('visible');
+            buildChatList();
+            setTimeout(() => intro.style.display = 'none', 1200);
+        }, 5500);
+    }
+
+    function buildChatList() {
+        const list = document.getElementById('chat-list-content');
+        list.innerHTML = '';
+        chatData.forEach(chat => {
+            const item = document.createElement('div');
+            item.className = 'chat-item';
+            item.innerHTML = `
+                <div class="avatar" style="background:${chat.color}; color:${chat.textColor || 'white'}">${chat.initial}</div>
+                <div class="chat-preview">
+                    <div class="chat-preview-top">
+                        <span class="name">${chat.name}</span>
+                        <span class="chat-list-time">${getTimestamp()}</span>
+                    </div>
+                    <span class="sub">${chat.isVoice ? '🎤 Sprachnachricht' : chat.sub}</span>
+                </div>
+            `;
+            item.onclick = () => openChat(chat);
+            list.appendChild(item);
+        });
+    }
+
+    async function openChat(chat) {
+        document.getElementById('listView').classList.add('view-hidden');
+        const detail = document.getElementById('detailView');
+        detail.style.display = 'flex';
+        setTimeout(() => detail.classList.add('view-active'), 50);
+        
+        const detailAvatar = document.getElementById('detail-avatar');
+        document.getElementById('detail-name').innerText = chat.name;
+        detailAvatar.innerText = chat.initial;
+        detailAvatar.style.background = chat.color;
+        detailAvatar.style.color = chat.textColor || 'white';
+        
+        const area = document.getElementById('message-area');
+        const input = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        area.innerHTML = ''; input.value = ''; sendBtn.disabled = true;
+
+        for (let i = 0; i < chat.initialMessages.length; i++) {
+            document.getElementById('typing-box').classList.remove('hidden');
+            await new Promise(r => setTimeout(r, 700 + Math.random() * 500));
+            document.getElementById('typing-box').classList.add('hidden');
+            
+            const msgText = chat.initialMessages[i];
+            if (msgText.includes("Financial Times")) {
+                addMediaLink();
+            } else if (chat.isVoice && i === 0) {
+                addVoiceBubble(chat);
+            } else {
+                addMsg(msgText, 'bot');
+            }
+            area.scrollTop = area.scrollHeight;
+        }
+
+        if (chat.options && chat.options[0]) {
+            input.value = chat.options[0].t;
+            sendBtn.disabled = false;
+            sendBtn.onclick = () => handleSend(chat.options[0]);
+        }
+    }
+
+    async function handleSend(option) {
+        const input = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        addMsg(option.t, 'user');
+        input.value = '';
+        sendBtn.disabled = true;
+
+        setTimeout(async () => {
+            document.getElementById('typing-box').classList.remove('hidden');
+            await new Promise(r => setTimeout(r, 1400));
+            document.getElementById('typing-box').classList.add('hidden');
+            addMsg(option.r, 'bot');
+        }, 500);
+    }
+
+    function addMsg(txt, type) {
+        const area = document.getElementById('message-area');
+        const wrapper = document.createElement('div');
+        wrapper.className = `msg-wrapper ${type}`;
+        wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">${getTimestamp()}</div>`;
+        area.appendChild(wrapper);
+        area.scrollTop = area.scrollHeight;
+    }
+
+    function addMediaLink() {
+        const area = document.getElementById('message-area');
+        const card = document.createElement('div');
+        card.className = 'media-card';
+        card.onclick = () => openOverlay('future-times-2.html');
+        card.innerHTML = `
+            <div class="media-img"></div>
+            <div class="media-info">
+                <div class="media-source">Future Times</div>
+                <strong>Canyon verdoppelt den Unternehmenswert in 4 Jahren</strong>
+                <p style="margin:4px 0 0 0; color:var(--text-gray); font-size:11px;">The Big Read: Wie Roman Arnold den Weltmarkt durch technologische Transformation erobert...</p>
+            </div>
+        `;
+        area.appendChild(card);
+    }
+
+    function openOverlay(url) {
+        const overlay = document.getElementById('browser-overlay');
+        const iframe = document.getElementById('browser-iframe');
+        iframe.src = url;
+        overlay.style.display = 'flex';
+    }
+
+    function closeOverlay() {
+        const overlay = document.getElementById('browser-overlay');
+        const iframe = document.getElementById('browser-iframe');
+        overlay.style.display = 'none';
+        iframe.src = '';
+    }
+
+    function addVoiceBubble(chat) {
+        const area = document.getElementById('message-area');
+        const wrapper = document.createElement('div');
+        wrapper.className = `msg-wrapper bot`;
+        wrapper.innerHTML = `<div class="voice-bubble" onclick="toggleAudio(this)"><button class="play-btn-circle">▶</button><div style="flex:1; height:4px; background:#444; border-radius:2px;"></div><span style="font-size:11px;">0:14</span></div><div style="font-size:12px; margin-top:8px; color:var(--text-gray); font-style:italic;">"${chat.voiceTxt}"</div>`;
+        area.appendChild(wrapper);
+        audioPlayer.onended = () => { const btn = document.querySelector('.play-btn-circle'); if(btn) btn.innerText = '▶'; };
+    }
+
+    function toggleAudio(container) {
+        const btn = container.querySelector('.play-btn-circle');
+        if (audioPlayer.paused) {
+            audioPlayer.src = 'BDC.wav';
+            audioPlayer.play().then(() => { btn.innerText = '⏸'; }).catch(e => console.log("Audio blockiert"));
+        } else {
+            audioPlayer.pause();
+            btn.innerText = '▶';
+        }
+    }
+
+    function closeChat() {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+        document.getElementById('detailView').classList.remove('view-active');
+        setTimeout(() => { 
+            document.getElementById('detailView').style.display = 'none'; 
+            document.getElementById('listView').classList.remove('view-hidden'); 
+        }, 400);
+    }
+
+    startApp();
+</script>
+</body>
+</html>
