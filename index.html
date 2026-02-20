@@ -49,13 +49,19 @@
         #browser-iframe { width: 100%; height: 100%; border: none; background: white; display: none; }
         #overlay-image { max-width: 95%; max-height: 90%; object-fit: contain; display: none; }
         
+        /* Schließen Button: Jetzt Dunkelgrau und gut sichtbar */
         .close-overlay-btn {
-            position: absolute; top: 20px; right: 20px;
-            width: 40px; height: 40px; background: rgba(255,255,255,0.2);
-            color: white; border-radius: 50%; border: none; font-size: 24px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 2100; backdrop-filter: blur(10px);
+            position: absolute; top: 25px; right: 20px;
+            width: 44px; height: 44px; 
+            background: #333333; /* Solides Dunkelgrau */
+            color: white; border-radius: 50%; 
+            border: 1.5px solid rgba(255,255,255,0.3); /* Subtiler Rand zur Abhebung */
+            font-size: 22px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 2100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: transform 0.1s;
         }
+        .close-overlay-btn:active { transform: scale(0.9); }
 
         .logo-container { width: 80%; max-width: 450px; margin-bottom: 30px; }
         .canyon-svg { fill: white; width: 100%; height: auto; display: block; }
@@ -86,7 +92,7 @@
         .view-hidden { transform: scale(0.96); opacity: 0; pointer-events: none; }
         .view-active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; }
 
-        /* Chat UI */
+        /* Chat UI Items */
         .chat-item { display: flex; padding: 14px 16px; align-items: center; border-bottom: 0.5px solid var(--border-gray); cursor: pointer; }
         .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; flex-shrink: 0; }
         .chat-preview { flex: 1; min-width: 0; display: flex; flex-direction: column; }
