@@ -49,9 +49,24 @@
         }
         #intro-overlay.fade-out { opacity: 0; visibility: hidden; }
 
-        /* --- Browser/Image Overlay --- */
-        #browser-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; display: none; flex-direction: column; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
-        #browser-overlay.active { display: flex; }
+        /* --- Browser/Image Overlay mit Slide-Animation --- */
+        #browser-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 2000; 
+            background: rgba(0,0,0,0.95); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+            transform: translateY(100%); /* Startposition unten */
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            visibility: hidden;
+        }
+        #browser-overlay.active { 
+            transform: translateY(0); /* Hochfahren */
+            visibility: visible;
+        }
+        
         #browser-iframe { width: 100%; height: 100%; border: none; background: white; display: none; }
         #overlay-image { max-width: 95%; max-height: 90%; object-fit: contain; display: none; }
         
@@ -88,7 +103,6 @@
         #detailView { z-index: 6; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: none; }
         .view-active { transform: translateX(0) !important; display: flex !important; }
 
-        /* Avatars */
         .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; flex-shrink: 0; overflow: hidden; background-size: cover; background-position: center; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -114,7 +128,6 @@
 
         .msg a { color: #58a6ff; text-decoration: underline; }
         
-        /* Media Card & Images */
         .chat-img-bubble { max-width: 240px; border-radius: 15px; overflow: hidden; margin: 5px 0; border: 0.5px solid var(--border-gray); flex-shrink: 0; cursor: pointer; }
         .chat-img-bubble img { width: 100%; height: auto; display: block; }
         
@@ -123,7 +136,6 @@
         .media-info { padding: 12px; font-size: 13px; line-height: 1.4; }
         .media-source { font-size: 10px; color: var(--text-gray); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.5px;}
 
-        /* Voice Bubble Style nach Screenshot */
         .voice-bubble { 
             background: var(--message-bot); padding: 12px; border-radius: 20px; 
             display: flex; align-items: center; gap: 12px; width: 100%; max-width: 320px; cursor: pointer; 
@@ -278,9 +290,7 @@
     function startApp() {
         const intro = document.getElementById('intro-overlay');
         const bar = document.getElementById('loader-bar');
-        
         intro.style.display = 'flex';
-        
         setTimeout(() => bar.style.width = '100%', 100);
         setTimeout(() => {
             intro.classList.add('fade-out');
@@ -420,7 +430,12 @@
     function closeOverlay() {
         const overlay = document.getElementById('browser-overlay');
         overlay.classList.remove('active');
-        document.getElementById('browser-iframe').src = '';
+        // Kleine Verzögerung vor dem Leeren des Iframes für flüssige Animation
+        setTimeout(() => {
+            if (!overlay.classList.contains('active')) {
+                document.getElementById('browser-iframe').src = '';
+            }
+        }, 400);
     }
 
     function addVoiceBubble(chat) {
@@ -431,7 +446,6 @@
         area.appendChild(div);
         area.scrollTop = area.scrollHeight;
         
-        // Reset Button bei Ende des Audios
         audioPlayer.onended = () => {
             const btn = div.querySelector('.play-btn-circle');
             if(btn) btn.innerText = '▶';
