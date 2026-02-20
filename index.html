@@ -49,29 +49,19 @@
         #browser-iframe { width: 100%; height: 100%; border: none; background: white; display: none; }
         #overlay-image { max-width: 95%; max-height: 90%; object-fit: contain; display: none; }
         
-        /* Schließen Button: Jetzt Dunkelgrau und gut sichtbar */
         .close-overlay-btn {
             position: absolute; top: 25px; right: 20px;
-            width: 44px; height: 44px; 
-            background: #333333; /* Solides Dunkelgrau */
-            color: white; border-radius: 50%; 
-            border: 1.5px solid rgba(255,255,255,0.3); /* Subtiler Rand zur Abhebung */
+            width: 44px; height: 44px; background: #333333;
+            color: white; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3);
             font-size: 22px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 2100;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            transition: transform 0.1s;
+            cursor: pointer; z-index: 2100; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
-        .close-overlay-btn:active { transform: scale(0.9); }
 
         .logo-container { width: 80%; max-width: 450px; margin-bottom: 30px; }
         .canyon-svg { fill: white; width: 100%; height: auto; display: block; }
         .intro-text { font-size: 18px; color: var(--text-white); margin-bottom: 45px; font-weight: 300; letter-spacing: 1px; opacity: 0.8; }
         .loader-container { width: 220px; height: 2px; background: #222; border-radius: 2px; overflow: hidden; }
         .loader-bar { width: 0%; height: 100%; background: var(--text-white); transition: width 5s linear; }
-
-        /* --- App Layout --- */
-        .app-container { display: flex; flex-direction: column; height: 100vh; position: relative; visibility: hidden; }
-        .app-container.visible { visibility: visible; }
 
         header {
             background-color: var(--bg-black);
@@ -92,9 +82,17 @@
         .view-hidden { transform: scale(0.96); opacity: 0; pointer-events: none; }
         .view-active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; }
 
-        /* Chat UI Items */
+        /* Avatar System: Image & Fallback */
+        .avatar { 
+            width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 600; font-size: 18px; flex-shrink: 0; 
+            background-size: cover; background-position: center;
+            overflow: hidden;
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
         .chat-item { display: flex; padding: 14px 16px; align-items: center; border-bottom: 0.5px solid var(--border-gray); cursor: pointer; }
-        .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; flex-shrink: 0; }
         .chat-preview { flex: 1; min-width: 0; display: flex; flex-direction: column; }
         .chat-preview-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
         .chat-preview .name { font-weight: 600; font-size: 16px; color: var(--text-white); }
@@ -114,8 +112,6 @@
         .user .msg { background: var(--message-user); }
         .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
 
-        .msg a { color: #58a6ff; text-decoration: underline; }
-        
         .chat-img-bubble {
             max-width: 240px; border-radius: 15px; overflow: hidden;
             margin: 5px 0; border: 0.5px solid var(--border-gray);
@@ -210,7 +206,7 @@
 <script>
     const chatData = [
       {
-        "id": 10, "name": "Rudi Rider", "initial": "R", "color": "#94a3b8", "sub": "❤️ Neues Aeroad",
+        "id": 10, "name": "Rudi Rider", "initial": "R", "color": "#94a3b8", "sub": "❤️ Neues Aeroad", "img": "rudi.png",
         "initialMessages": [
             "Hi Roman, mein neues Aeroad kam an. Euer Bike Fitting Service begeistert!",
             "SHOW_PRODUCT_IMAGE",
@@ -219,12 +215,12 @@
         "options": [{ "t": "Genau das war der Plan: Ein System, das den Rider perfekt kennt. Danke für deine Treue!", "r": "Beratung wie früher in der Garage – nur digital. 📸" }]
       },
       {
-        "id": 7, "name": "Sarah", "initial": "S", "color": "#8b5cf6", "sub": "Community Managerin",
+        "id": 7, "name": "Sarah", "initial": "S", "color": "#8b5cf6", "sub": "Community Managerin", "img": "sarah.png",
         "initialMessages": ["Roman! NPS auf Rekordhoch. 📈", "KI löst Standard-Themen und wir haben Zeit für echte Geschichten.", "Feedback bleibt unser wichtigster Input!"],
         "options": [{ "t": "Genau, also wie immer: Schick mir Montag die kritischen Stimmen.", "r": "Keine Sorge, die Montags-Runde bleibt heilig. 😉" }]
       },
       {
-        "id": 6, "name": "Rad Race", "initial": "RR", "color": "#10b981", "sub": "Best Canyon Service",
+        "id": 6, "name": "Rad Race", "initial": "RR", "color": "#10b981", "sub": "Best Canyon Service", "img": "radrace.png",
         "initialMessages": [
           "Hey Roman, mega, was ihr in den letzten Jahren mit dem Neustart der Service Plattform erreicht habt!",
           "Es macht richtig Spaß mit euch zu arbeiten, weil wir immer top im Vorfeld zu den Riders und den Bikes informiert sind, die zu uns in die Werkstatt kommen."
@@ -232,7 +228,7 @@
         "options": [{ "t": "Super, freut mich, dass ihr mit Canyon wachsen könnt. Ihr seid für uns ein ganz wichtiger Erfolgsfaktor!", "r": "'Pure Cycling' bis in die letzte Schraube. Gerne zeige ich dir mal unsere neue Werkstatt in München. Wann passt es dir?" }]
       },
       {
-        "id": 2, "name": "GBL Stratege", "initial": "GS", "color": "#ef4444", "sub": "Turn-Around",
+        "id": 2, "name": "GBL Stratege", "initial": "GS", "color": "#ef4444", "sub": "Turn-Around", "img": "gbl.png",
         "initialMessages": [
           "Glückwunsch zum Turn-Around! 🥂",
           "Die Entscheidungen in 2026 waren genau richtig - der Invest zahlt sich nun aus.",
@@ -241,7 +237,7 @@
         "options": [{ "t": "Danke für euren Support in schwierigen Zeiten!", "r": "Canyon ist wieder Top 3 in unserem Portfolio! Lass uns diesen Weg gemeinsam weitergehen!" }]
       },
       {
-        "id": 1, "name": "Mathieu", "initial": "M", "color": "#ffffff", "textColor": "#01326F", "sub": "Unser Weltmeister 🌈",
+        "id": 1, "name": "Mathieu", "initial": "M", "color": "#ffffff", "textColor": "#01326F", "sub": "Unser Weltmeister 🌈", "img": "mathieu.png",
         "initialMessages": [
           "Hey Roman! 🌈 Nächster Titel... Wahnsinn.",
           "Danke für eure Innovationen der letzen Jahre. Es macht mich so stolz ein Gesicht des Canyon-Teams zu sein.",
@@ -250,17 +246,17 @@
         "options": [{ "t": "Glückwunsch! 👑 Wir haben das Fundament gebaut, fliegen musstest du!", "r": "Tolle Teamleistung der Canyon-Familie. Bis bald! 🥂" }]
       },
       {
-        "id": 5, "name": "LeBron James", "initial": "LJ", "color": "#f59e0b", "sub": "LBJ Legacy Bike",
+        "id": 5, "name": "LeBron James", "initial": "LJ", "color": "#f59e0b", "sub": "LBJ Legacy Bike", "img": "lebron.png",
         "initialMessages": ["Yo Roman! 🏀 R126 has gone live! The campaign is on point in the US, sales is skyrocketing!"],
         "options": [{ "t": "King James! 👑 Fantastic! Our approach to understand our riders even better takes off! I'm very proud of our achievements", "r": "Me too, Roman. Wanna join me on a ride in LA together with Mark Allen?" }]
       },
       {
-        "id": 9, "name": "CFO", "initial": "CF", "color": "#64748b", "sub": "TCO & Margen",
+        "id": 9, "name": "CFO", "initial": "CF", "color": "#64748b", "sub": "TCO & Margen", "img": "cfo.png",
         "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉", "15 Altsysteme weg. Geld fließt direkt in die neue F&E.", "So macht Optimieren Spaß, weil Werte entstehen!"],
         "options": [{ "t": "Weniger Silos = mehr Freiheit für Entwicklung. Ich hätte nie gedacht, dass wir so viel Potenzial heben können.", "r": "Ich hab's dir doch immer gesagt. 📈 Wie immer? Abendrunde Mittwoch 18 Uhr?" }]
       },
       {
-        "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#C300FF", "textColor": "#ffffff", "sub": "We Create CX Champions",
+        "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#C300FF", "textColor": "#ffffff", "sub": "We Create CX Champions", "img": "thilo.png",
         "initialMessages": [
           "Morgen Roman! Ich bin richtig stolz darauf, was wir gemeinsam geschaffen haben.",
           "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute gemeinsame Ergebnisse erziehlt."
@@ -268,13 +264,13 @@
         "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir endlich unseren Datenschatz heben können.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
       },
       {
-        "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "isVoice": true,
+        "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "img": "marketing.png", "isVoice": true,
         "voiceTxt": "Hi Roman! WOW! Wie haben wir das früher ohne die SAP Data Platform gemacht? Unbezahlbar, so nah am Rider zu sein. Mega!",
         "initialMessages": ["🎤 Sprachnachricht empfangen"],
         "options": [{ "t": "Data is king! 🦾 Wie hat sich der Customer Lifetime Value entwickelt?", "r": "Über 25% gestiegen dank unserer Fokusussierung 2026! 📈 Unsere Rider und die Community spüren die Leidenschaft. Echte Loyalität!" }]
       },
       {
-        "id": 8, "name": "Shanghai Store", "initial": "SH", "color": "#3b82f6", "sub": "Skalierung Asien",
+        "id": 8, "name": "Shanghai Store", "initial": "SH", "color": "#3b82f6", "sub": "Skalierung Asien", "img": "shanghai.png",
         "initialMessages": ["Grüße aus Shanghai! 🇨🇳 MyCanyon ist der Wahnsinn.", "Das Custom-Rad ist schneller beim Kunden als je zuvor.", "Die neuen Systeme haben unsere Skalierung überhaupt erst möglich gemacht. Ich hätte nie gedacht, dass wir so schnell handlungsfähig werden."],
         "options": [{ "t": "Shanghai ist ein Schlüsselmarkt. Der Backbone war ein wichtiger Hebel.", "r": "Absolut! War die beste Entscheidung der letzten Jahre. Wir sind unschlagbar." }]
       }
@@ -302,6 +298,17 @@
         }, 5500);
     }
 
+    // Avatar Generator Helper
+    function getAvatarHTML(chat) {
+        if (chat.img) {
+            // Versuche das Bild zu laden, Fallback auf Initialen bei Error
+            return `<div class="avatar" style="background-color:${chat.color}; color:${chat.textColor || 'white'}">
+                        <img src="${chat.img}" onerror="this.style.display='none'; this.parentElement.innerHTML='${chat.initial}'">
+                    </div>`;
+        }
+        return `<div class="avatar" style="background:${chat.color}; color:${chat.textColor || 'white'}">${chat.initial}</div>`;
+    }
+
     function buildChatList() {
         const list = document.getElementById('chat-list-content');
         list.innerHTML = '';
@@ -309,7 +316,7 @@
             const item = document.createElement('div');
             item.className = 'chat-item';
             item.innerHTML = `
-                <div class="avatar" style="background:${chat.color}; color:${chat.textColor || 'white'}">${chat.initial}</div>
+                ${getAvatarHTML(chat)}
                 <div class="chat-preview">
                     <div class="chat-preview-top">
                         <span class="name">${chat.name}</span>
@@ -331,9 +338,17 @@
         
         const detailAvatar = document.getElementById('detail-avatar');
         document.getElementById('detail-name').innerText = chat.name;
-        detailAvatar.innerText = chat.initial;
-        detailAvatar.style.background = chat.color;
-        detailAvatar.style.color = chat.textColor || 'white';
+        
+        // Detail-Avatar setzen (mit Fallback)
+        if (chat.img) {
+            detailAvatar.style.backgroundColor = chat.color;
+            detailAvatar.style.color = chat.textColor || 'white';
+            detailAvatar.innerHTML = `<img src="${chat.img}" onerror="this.style.display='none'; this.parentElement.innerHTML='${chat.initial}'">`;
+        } else {
+            detailAvatar.innerText = chat.initial;
+            detailAvatar.style.background = chat.color;
+            detailAvatar.style.color = chat.textColor || 'white';
+        }
         
         const area = document.getElementById('message-area');
         const input = document.getElementById('chat-input');
@@ -422,7 +437,6 @@
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
         const img = document.getElementById('overlay-image');
-        
         iframe.src = url;
         iframe.style.display = 'block';
         img.style.display = 'none';
@@ -433,7 +447,6 @@
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
         const img = document.getElementById('overlay-image');
-        
         img.src = src;
         img.style.display = 'block';
         iframe.style.display = 'none';
@@ -444,7 +457,6 @@
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
         const img = document.getElementById('overlay-image');
-        
         overlay.style.display = 'none';
         iframe.src = '';
         iframe.style.display = 'none';
