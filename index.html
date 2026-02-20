@@ -36,12 +36,12 @@
         .app-container { display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; visibility: hidden; }
         .app-container.visible { visibility: visible !important; }
 
-        /* --- Intro Overlay (Fix: Z-Index & Flex) --- */
+        /* --- Intro Overlay --- */
         #intro-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: 9999; /* Höchste Ebene */
+            z-index: 9999; 
             background-color: var(--bg-black); 
-            display: flex !important; /* Immer Flex für Zentrierung */
+            display: flex !important; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
@@ -112,6 +112,8 @@
         .user .msg { background: var(--message-user); }
         .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
 
+        .msg a { color: #58a6ff; text-decoration: underline; }
+        
         .chat-img-bubble { max-width: 240px; border-radius: 15px; overflow: hidden; margin: 5px 0; border: 0.5px solid var(--border-gray); flex-shrink: 0; cursor: pointer; }
         .chat-img-bubble img { width: 100%; height: auto; display: block; }
         
@@ -121,7 +123,7 @@
 
         .input-area {
             background: var(--header-dark); 
-            padding: 10px 15px calc(15px + env(safe-area-inset-bottom)) 15px;
+            padding: 10px 15px calc(10px + env(safe-area-inset-bottom)) 15px;
             border-top: 0.5px solid var(--border-gray); 
             display: flex; align-items: center; gap: 10px; flex-shrink: 0;
         }
@@ -158,9 +160,9 @@
     </header>
 
     <div class="view-wrapper">
-        <div id="listView" class="view"><div id="chat-list-content"></div></div>
+        <div id="listView" class="view view-active"><div id="chat-list-content"></div></div>
         
-        <div id="detailView" class="view">
+        <div id="detailView" class="view" style="position: absolute; top: 0; left: 0; height: 100%; display: none;">
             <div class="chat-detail-header">
                 <span class="back-btn" onclick="closeChat()">‹</span>
                 <div id="detail-avatar" class="avatar" style="width:36px; height:36px; font-size:14px; margin-right:10px;"></div>
@@ -185,46 +187,74 @@
 
 <script>
     const chatData = [
-      { "id": 10, "name": "Rudi Rider", "initial": "R", "color": "#94a3b8", "sub": "❤️ Neues Aeroad", "img": "rudi.png",
-        "initialMessages": ["Hi Roman, mein neues Aeroad kam an. Euer Bike Fitting Service begeistert!", "SHOW_PRODUCT_IMAGE", "Stack und Reach passen perfekt. Das ist Perfektion."],
+      {
+        "id": 10, "name": "Rudi Rider", "initial": "R", "color": "#94a3b8", "sub": "❤️ Neues Aeroad", "img": "rudi.png",
+        "initialMessages": [
+            "Hi Roman, mein neues Aeroad kam an. Euer Bike Fitting Service begeistert!",
+            "SHOW_PRODUCT_IMAGE",
+            "Stack und Reach passen perfekt. Das ist Perfektion."
+        ],
         "options": [{ "t": "Genau das war der Plan: Ein System, das den Rider perfekt kennt. Danke für deine Treue!", "r": "Beratung wie früher in der Garage – nur digital. 📸" }]
       },
-      { "id": 7, "name": "Sarah", "initial": "S", "color": "#8b5cf6", "sub": "Community Managerin", "img": "sarah.png",
-        "initialMessages": ["Roman! NPS auf Rekordhoch. 📈", "KI löst Standard-Themen und wir haben Zeit für echte Geschichten."],
+      {
+        "id": 7, "name": "Sarah", "initial": "S", "color": "#8b5cf6", "sub": "Community Managerin", "img": "sarah.png",
+        "initialMessages": ["Roman! NPS auf Rekordhoch. 📈", "KI löst Standard-Themen und wir haben Zeit für echte Geschichten.", "Feedback bleibt unser wichtigster Input!"],
         "options": [{ "t": "Genau, also wie immer: Schick mir Montag die kritischen Stimmen.", "r": "Keine Sorge, die Montags-Runde bleibt heilig. 😉" }]
       },
-      { "id": 6, "name": "Rad Race", "initial": "RR", "color": "#10b981", "sub": "Best Canyon Service", "img": "radrace.png",
-        "initialMessages": ["Hey Roman, mega, was ihr erreicht habt!", "Es macht richtig Spaß mit euch zu arbeiten."],
-        "options": [{ "t": "Super, freut mich!", "r": "'Pure Cycling' bis in die letzte Schraube." }]
+      {
+        "id": 6, "name": "Rad Race", "initial": "RR", "color": "#10b981", "sub": "Best Canyon Service", "img": "radrace.png",
+        "initialMessages": [
+          "Hey Roman, mega, was ihr in den letzten Jahren mit dem Neustart der Service Plattform erreicht habt!",
+          "Es macht richtig Spaß mit euch zu arbeiten, weil wir immer top im Vorfeld zu den Riders und den Bikes informiert sind, die zu uns in die Werkstatt kommen."
+        ],
+        "options": [{ "t": "Super, freut mich, dass ihr mit Canyon wachsen könnt. Ihr seid für uns ein ganz wichtiger Erfolgsfaktor!", "r": "'Pure Cycling' bis in die letzte Schraube. Gerne zeige ich dir mal unsere neue Werkstatt in München. Wann passt es dir?" }]
       },
-      { "id": 2, "name": "GBL Stratege", "initial": "GS", "color": "#ef4444", "sub": "Turn-Around", "img": "gbl.png",
-        "initialMessages": ["Glückwunsch zum Turn-Around! 🥂", "Die Entscheidungen 2026 waren richtig.", "Press: Future Times (Picture embedded)"],
-        "options": [{ "t": "Danke!", "r": "Lass uns diesen Weg gemeinsam weitergehen!" }]
+      {
+        "id": 2, "name": "GBL Stratege", "initial": "GS", "color": "#ef4444", "sub": "Turn-Around", "img": "gbl.png",
+        "initialMessages": [
+          "Glückwunsch zum Turn-Around! 🥂",
+          "Die Entscheidungen in 2026 waren genau richtig - der Invest zahlt sich nun aus.",
+          "Press: Future Times (Picture embedded) - Headline: Canyon verdoppelt den Unternehmenswert in 4 Jahren."
+        ],
+        "options": [{ "t": "Danke für euren Support in schwierigen Zeiten!", "r": "Canyon ist wieder Top 3 in unserem Portfolio! Lass uns diesen Weg gemeinsam weitergehen!" }]
       },
-      { "id": 1, "name": "Mathieu", "initial": "M", "color": "#ffffff", "textColor": "#01326F", "sub": "Unser Weltmeister 🌈", "img": "mathieu.png",
-        "initialMessages": ["Hey Roman! 🌈 Nächster Titel... Wahnsinn."],
-        "options": [{ "t": "Glückwunsch!", "r": "Tolle Teamleistung." }]
+      {
+        "id": 1, "name": "Mathieu", "initial": "M", "color": "#ffffff", "textColor": "#01326F", "sub": "Unser Weltmeister 🌈", "img": "mathieu.png",
+        "initialMessages": [
+          "Hey Roman! 🌈 Nächster Titel... Wahnsinn.",
+          "Danke für eure Innovationen der letzen Jahre. Es macht mich so stolz ein Gesicht des Canyon-Teams zu sein.",
+          "Meine Vielseitigkeit, eure Performance - unschlagbar! 🏆"
+        ],
+        "options": [{ "t": "Glückwunsch! 👑 Wir haben das Fundament gebaut, fliegen musstest du!", "r": "Tolle Teamleistung der Canyon-Familie. Bis bald! 🥂" }]
       },
-      { "id": 5, "name": "LeBron James", "initial": "LJ", "color": "#f59e0b", "sub": "LBJ Legacy Bike", "img": "lebron.png",
-        "initialMessages": ["Yo Roman! 🏀 R126 has gone live!"],
-        "options": [{ "t": "Fantastic!", "r": "Me too, Roman." }]
+      {
+        "id": 5, "name": "LeBron James", "initial": "LJ", "color": "#f59e0b", "sub": "LBJ Legacy Bike", "img": "lebron.png",
+        "initialMessages": ["Yo Roman! 🏀 R126 has gone live! The campaign is on point in the US, sales is skyrocketing!"],
+        "options": [{ "t": "King James! 👑 Fantastic! Our approach to understand our riders even better takes off! I'm very proud of our achievements", "r": "Me too, Roman. Wanna join me on a ride in LA together with Mark Allen?" }]
       },
-      { "id": 9, "name": "CFO", "initial": "CF", "color": "#64748b", "sub": "TCO & Margen", "img": "cfo.png",
-        "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉"],
-        "options": [{ "t": "Weniger Silos = mehr Freiheit.", "r": "Ich hab's dir immer gesagt." }]
+      {
+        "id": 9, "name": "CFO", "initial": "CF", "color": "#64748b", "sub": "TCO & Margen", "img": "cfo.png",
+        "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉", "15 Altsysteme weg. Geld fließt direkt in die neue F&E.", "So macht Optimieren Spaß, weil Werte entstehen!"],
+        "options": [{ "t": "Weniger Silos = mehr Freiheit für Entwicklung. Ich hätte nie gedacht, dass wir so viel Potenzial heben können.", "r": "Ich hab's dir doch immer gesagt. 📈 Wie immer? Abendrunde Mittwoch 18 Uhr?" }]
       },
-      { "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#C300FF", "textColor": "#ffffff", "sub": "CX Champions", "img": "thilo.png",
-        "initialMessages": ["Morgen Roman!", "Stolz auf unsere Ergebnisse."],
-        "options": [{ "t": "Datenschatz gehoben.", "r": "💜 Lass uns telefonieren: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
+      {
+        "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#C300FF", "textColor": "#ffffff", "sub": "We Create CX Champions", "img": "thilo.png",
+        "initialMessages": [
+          "Morgen Roman! Ich bin richtig stolz darauf, was wir gemeinsam geschaffen haben.",
+          "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute gemeinsame Ergebnisse erziehlt."
+        ],
+        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir endlich unseren Datenschatz heben können.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
       },
-      { "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht", "img": "marketing.png", "isVoice": true,
-        "voiceTxt": "Hi Roman! WOW!",
+      {
+        "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "img": "marketing.png", "isVoice": true,
+        "voiceTxt": "Hi Roman! WOW! Wie haben wir das früher ohne die SAP Data Platform gemacht? Unbezahlbar, so nah am Rider zu sein. Mega!",
         "initialMessages": ["🎤 Sprachnachricht empfangen"],
-        "options": [{ "t": "Data is king!", "r": "Echte Loyalität!" }]
+        "options": [{ "t": "Data is king! 🦾 Wie hat sich der Customer Lifetime Value entwickelt?", "r": "Über 25% gestiegen dank unserer Fokusussierung 2026! 📈 Unsere Rider und die Community spüren die Leidenschaft. Echte Loyalität!" }]
       },
-      { "id": 8, "name": "Shanghai Store", "initial": "SH", "color": "#3b82f6", "sub": "Skalierung Asien", "img": "shanghai.png",
-        "initialMessages": ["Grüße aus Shanghai! 🇨🇳"],
-        "options": [{ "t": "Ein wichtiger Hebel.", "r": "Absolut!" }]
+      {
+        "id": 8, "name": "Shanghai Store", "initial": "SH", "color": "#3b82f6", "sub": "Skalierung Asien", "img": "shanghai.png",
+        "initialMessages": ["Grüße aus Shanghai! 🇨🇳 MyCanyon ist der Wahnsinn.", "Das Custom-Rad ist schneller beim Kunden als je zuvor.", "Die neuen Systeme haben unsere Skalierung überhaupt erst möglich gemacht. Ich hätte nie gedacht, dass wir so schnell handlungsfähig werden."],
+        "options": [{ "t": "Shanghai ist ein Schlüsselmarkt. Der Backbone war ein wichtiger Hebel.", "r": "Absolut! War die beste Entscheidung der letzten Jahre. Wir sind unschlagbar." }]
       }
     ];
 
@@ -239,7 +269,6 @@
         const intro = document.getElementById('intro-overlay');
         const bar = document.getElementById('loader-bar');
         
-        // Initialer Check: Intro sicherstellen
         intro.style.display = 'flex';
         
         setTimeout(() => bar.style.width = '100%', 100);
@@ -361,6 +390,7 @@
         document.getElementById('browser-iframe').style.display = 'block';
         document.getElementById('overlay-image').style.display = 'none';
         overlay.classList.add('active');
+        if (window.umami) umami.track('View Article', { url: url });
     }
 
     function openImageOverlay(src) {
