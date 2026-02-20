@@ -114,16 +114,26 @@
 
         .msg a { color: #58a6ff; text-decoration: underline; }
         
+        /* Media Card & Images */
         .chat-img-bubble { max-width: 240px; border-radius: 15px; overflow: hidden; margin: 5px 0; border: 0.5px solid var(--border-gray); flex-shrink: 0; cursor: pointer; }
         .chat-img-bubble img { width: 100%; height: auto; display: block; }
         
-        .media-card { background: var(--message-bot); border-radius: 12px; overflow: hidden; margin: 5px 0; border: 0.5px solid var(--border-gray); max-width: 280px; height: 240px; flex-shrink: 0; cursor: pointer; }
+        .media-card { background: var(--message-bot); border-radius: 12px; overflow: hidden; margin: 5px 0; border: 0.5px solid var(--border-gray); max-width: 280px; height: 260px; min-height: 260px; flex-shrink: 0; cursor: pointer; }
         .media-img { width: 100%; height: 140px; background: #f2e6e6 url('ft-cover.png') no-repeat center center; background-size: cover; }
         .media-info { padding: 12px; font-size: 13px; line-height: 1.4; }
+        .media-source { font-size: 10px; color: var(--text-gray); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.5px;}
+
+        /* Voice Bubble Style nach Screenshot */
+        .voice-bubble { 
+            background: var(--message-bot); padding: 12px; border-radius: 20px; 
+            display: flex; align-items: center; gap: 12px; width: 100%; max-width: 320px; cursor: pointer; 
+        }
+        .play-btn-circle { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: none; font-size: 14px; flex-shrink: 0; }
+        .voice-line { flex: 1; height: 3px; background: #444; border-radius: 2px; }
 
         .input-area {
             background: var(--header-dark); 
-            padding: 10px 15px calc(10px + env(safe-area-inset-bottom)) 15px;
+            padding: 10px 15px calc(15px + env(safe-area-inset-bottom)) 15px;
             border-top: 0.5px solid var(--border-gray); 
             display: flex; align-items: center; gap: 10px; flex-shrink: 0;
         }
@@ -214,7 +224,7 @@
         "initialMessages": [
           "Glückwunsch zum Turn-Around! 🥂",
           "Die Entscheidungen in 2026 waren genau richtig - der Invest zahlt sich nun aus.",
-          "Press: Future Times (Picture embedded) - Headline: Canyon verdoppelt den Unternehmenswert in 4 Jahren."
+          "Press: Future Times (Picture embedded)"
         ],
         "options": [{ "t": "Danke für euren Support in schwierigen Zeiten!", "r": "Canyon ist wieder Top 3 in unserem Portfolio! Lass uns diesen Weg gemeinsam weitergehen!" }]
       },
@@ -379,7 +389,13 @@
         const card = document.createElement('div');
         card.className = 'media-card';
         card.onclick = () => openWebOverlay('future-times-2.html');
-        card.innerHTML = `<div class="media-img"></div><div class="media-info"><strong>Canyon verdoppelt Wert</strong></div>`;
+        card.innerHTML = `
+            <div class="media-img"></div>
+            <div class="media-info">
+                <div class="media-source">Future Times</div>
+                <strong>Canyon verdoppelt den Unternehmenswert in 4 Jahren</strong>
+                <p style="margin:4px 0 0 0; color:var(--text-gray); font-size:11px;">The Big Read: Wie Roman Arnold den Weltmarkt durch technologische Transformation erobert...</p>
+            </div>`;
         area.appendChild(card);
         area.scrollTop = area.scrollHeight;
     }
@@ -411,14 +427,33 @@
         const area = document.getElementById('message-area');
         const div = document.createElement('div');
         div.className = `msg-wrapper bot`;
-        div.innerHTML = `<div class="voice-bubble" onclick="toggleAudio()"><button class="play-btn-circle">▶</button></div>`;
+        div.innerHTML = `<div class="voice-bubble" onclick="toggleAudio(this)"><button class="play-btn-circle">▶</button><div class="voice-line"></div><span style="font-size:11px;">0:14</span></div><div style="font-size:12px; margin-top:8px; color:var(--text-gray); font-style:italic;">"${chat.voiceTxt}"</div>`;
         area.appendChild(div);
         area.scrollTop = area.scrollHeight;
+        
+        // Reset Button bei Ende des Audios
+        audioPlayer.onended = () => {
+            const btn = div.querySelector('.play-btn-circle');
+            if(btn) btn.innerText = '▶';
+        };
     }
 
-    function toggleAudio() { audioPlayer.src = 'BDC.wav'; audioPlayer.play(); }
+    function toggleAudio(container) {
+        const btn = container.querySelector('.play-btn-circle');
+        if (audioPlayer.paused || audioPlayer.ended) {
+            audioPlayer.src = 'BDC.wav';
+            audioPlayer.play().then(() => { 
+                btn.innerText = '⏸'; 
+            }).catch(e => console.log("Audio blockiert"));
+        } else {
+            audioPlayer.pause();
+            btn.innerText = '▶';
+        }
+    }
 
     function closeChat() {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
         document.getElementById('detailView').classList.remove('view-active');
         setTimeout(() => { 
             document.getElementById('detailView').style.display = 'none'; 
