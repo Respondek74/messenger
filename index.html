@@ -105,6 +105,9 @@
         .user .msg { background: var(--message-user); }
         .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
 
+        /* Links in Messages */
+        .msg a { color: #58a6ff; text-decoration: underline; }
+
         /* Media Card */
         .media-card {
             background: var(--message-bot); border-radius: 12px; overflow: hidden;
@@ -216,7 +219,7 @@
           "Morgen Roman! Ich bin richtig stolz darauf, was wir gemeinsam geschaffen haben.",
           "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute Ergebnisse erzielt."
         ],
-        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir unseren Datenschatz gehoben.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Meine Nummer hast du ja (+49 1752 957364)" }]
+        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir unseren Datenschatz gehoben.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
       },
       {
         "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "isVoice": true,
