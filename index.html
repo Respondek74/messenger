@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Canyon Messenger 2036</title>
+    <title>Canyon Messenger 2029</title>
+    
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="dd92207d-a0ed-4644-af2d-d4fa2500f7f8"></script>
+
     <style>
         :root {
             --bg-black: #000000;
@@ -82,7 +85,6 @@
         .view-hidden { transform: scale(0.96); opacity: 0; pointer-events: none; }
         .view-active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; }
 
-        /* Avatar System: Image & Fallback */
         .avatar { 
             width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; 
             display: flex; align-items: center; justify-content: center; 
@@ -112,6 +114,8 @@
         .user .msg { background: var(--message-user); }
         .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
 
+        .msg a { color: #58a6ff; text-decoration: underline; }
+        
         .chat-img-bubble {
             max-width: 240px; border-radius: 15px; overflow: hidden;
             margin: 5px 0; border: 0.5px solid var(--border-gray);
@@ -261,7 +265,7 @@
           "Morgen Roman! Ich bin richtig stolz darauf, was wir gemeinsam geschaffen haben.",
           "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute gemeinsame Ergebnisse erziehlt."
         ],
-        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir endlich unseren Datenschatz heben können.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
+        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir endlich unseren Datenschatz heben können.", "r": "Lass uns telefonieren, um die nächste Stufe zu zünden. 💜 Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
       },
       {
         "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "img": "marketing.png", "isVoice": true,
@@ -282,7 +286,7 @@
         const now = new Date();
         const hrs = now.getHours().toString().padStart(2, '0');
         const min = now.getMinutes().toString().padStart(2, '0');
-        return `${hrs}:${min} (18.02.2036)`;
+        return `${hrs}:${min} (18.02.2029)`;
     }
 
     function startApp() {
@@ -298,12 +302,11 @@
         }, 5500);
     }
 
-    // Avatar Generator Helper
+    // Avatar HTML Generator with Image Fallback Support
     function getAvatarHTML(chat) {
         if (chat.img) {
-            // Versuche das Bild zu laden, Fallback auf Initialen bei Error
             return `<div class="avatar" style="background-color:${chat.color}; color:${chat.textColor || 'white'}">
-                        <img src="${chat.img}" onerror="this.style.display='none'; this.parentElement.innerHTML='${chat.initial}'">
+                        <img src="${chat.img}" onerror="this.style.display='none'; this.parentElement.innerText='${chat.initial}'">
                     </div>`;
         }
         return `<div class="avatar" style="background:${chat.color}; color:${chat.textColor || 'white'}">${chat.initial}</div>`;
@@ -339,11 +342,11 @@
         const detailAvatar = document.getElementById('detail-avatar');
         document.getElementById('detail-name').innerText = chat.name;
         
-        // Detail-Avatar setzen (mit Fallback)
+        // Detail Avatar setzen
         if (chat.img) {
             detailAvatar.style.backgroundColor = chat.color;
             detailAvatar.style.color = chat.textColor || 'white';
-            detailAvatar.innerHTML = `<img src="${chat.img}" onerror="this.style.display='none'; this.parentElement.innerHTML='${chat.initial}'">`;
+            detailAvatar.innerHTML = `<img src="${chat.img}" onerror="this.style.display='none'; this.parentElement.innerText='${chat.initial}'">`;
         } else {
             detailAvatar.innerText = chat.initial;
             detailAvatar.style.background = chat.color;
@@ -377,6 +380,11 @@
             input.value = chat.options[0].t;
             sendBtn.disabled = false;
             sendBtn.onclick = () => handleSend(chat.options[0]);
+        }
+
+        // UMAMI Event für Chat-Öffnung
+        if (window.umami) {
+            umami.track('Open Chat', { name: chat.name });
         }
     }
 
@@ -437,16 +445,21 @@
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
         const img = document.getElementById('overlay-image');
+        
         iframe.src = url;
         iframe.style.display = 'block';
         img.style.display = 'none';
         overlay.style.display = 'flex';
+
+        // UMAMI Event für Artikel
+        if (window.umami) umami.track('View Article', { url: url });
     }
 
     function openImageOverlay(src) {
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
         const img = document.getElementById('overlay-image');
+        
         img.src = src;
         img.style.display = 'block';
         iframe.style.display = 'none';
@@ -457,6 +470,7 @@
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
         const img = document.getElementById('overlay-image');
+        
         overlay.style.display = 'none';
         iframe.src = '';
         iframe.style.display = 'none';
