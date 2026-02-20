@@ -40,17 +40,21 @@
         #intro-overlay.fade-out { opacity: 0; visibility: hidden; }
 
         #browser-overlay {
-            background: white; z-index: 2000;
+            background: rgba(0,0,0,0.95); z-index: 2000;
             animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            justify-content: center; align-items: center;
         }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        #browser-iframe { width: 100%; flex: 1; border: none; }
+        
+        #browser-iframe { width: 100%; height: 100%; border: none; background: white; display: none; }
+        #overlay-image { max-width: 95%; max-height: 90%; object-fit: contain; display: none; }
+        
         .close-overlay-btn {
             position: absolute; top: 20px; right: 20px;
-            width: 40px; height: 40px; background: rgba(0,0,0,0.5);
+            width: 40px; height: 40px; background: rgba(255,255,255,0.2);
             color: white; border-radius: 50%; border: none; font-size: 24px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 2100; backdrop-filter: blur(5px);
+            cursor: pointer; z-index: 2100; backdrop-filter: blur(10px);
         }
 
         .logo-container { width: 80%; max-width: 450px; margin-bottom: 30px; }
@@ -82,7 +86,7 @@
         .view-hidden { transform: scale(0.96); opacity: 0; pointer-events: none; }
         .view-active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; }
 
-        /* Chat List Item */
+        /* Chat UI */
         .chat-item { display: flex; padding: 14px 16px; align-items: center; border-bottom: 0.5px solid var(--border-gray); cursor: pointer; }
         .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; flex-shrink: 0; }
         .chat-preview { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -91,7 +95,6 @@
         .chat-list-time { font-size: 12px; color: var(--text-gray); white-space: nowrap; margin-left: 10px; }
         .chat-preview .sub { color: var(--text-gray); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Detail View UI */
         .chat-detail-header { padding: 10px 15px; background: var(--header-dark); display: flex; align-items: center; border-bottom: 0.5px solid var(--border-gray); }
         .back-btn { font-size: 30px; color: var(--accent-blue); padding-right: 15px; cursor: pointer; }
         .message-area { flex: 1; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-bottom: 30px; }
@@ -105,17 +108,15 @@
         .user .msg { background: var(--message-user); }
         .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
 
-        /* Links & Media in Messages */
         .msg a { color: #58a6ff; text-decoration: underline; }
         
         .chat-img-bubble {
             max-width: 240px; border-radius: 15px; overflow: hidden;
             margin: 5px 0; border: 0.5px solid var(--border-gray);
-            background: var(--message-bot);
+            background: var(--message-bot); cursor: pointer;
         }
         .chat-img-bubble img { width: 100%; height: auto; display: block; }
 
-        /* Media Card (Future Times) */
         .media-card {
             background: var(--message-bot); border-radius: 12px; overflow: hidden;
             margin: 5px 0; border: 0.5px solid var(--border-gray); max-width: 280px;
@@ -125,7 +126,6 @@
         .media-info { padding: 12px; font-size: 13px; line-height: 1.4; }
         .media-source { font-size: 10px; color: var(--text-gray); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.5px;}
 
-        /* Input Area */
         .input-area {
             background: var(--header-dark); padding: 10px 15px 35px 15px;
             border-top: 0.5px solid var(--border-gray); display: flex; align-items: center; gap: 10px;
@@ -152,6 +152,7 @@
 <div id="browser-overlay">
     <button class="close-overlay-btn" onclick="closeOverlay()">✕</button>
     <iframe id="browser-iframe" src=""></iframe>
+    <img id="overlay-image" src="" alt="Zoom Image">
 </div>
 
 <div id="intro-overlay">
@@ -387,7 +388,7 @@
         const wrapper = document.createElement('div');
         wrapper.className = 'bot';
         wrapper.innerHTML = `
-            <div class="chat-img-bubble">
+            <div class="chat-img-bubble" onclick="openImageOverlay('aeroad.png')">
                 <img src="aeroad.png" alt="Canyon Aeroad">
             </div>
             <div class="timestamp" style="margin-top: -5px; margin-bottom: 10px;">${getTimestamp()}</div>
@@ -399,7 +400,7 @@
         const area = document.getElementById('message-area');
         const card = document.createElement('div');
         card.className = 'media-card';
-        card.onclick = () => openOverlay('future-times-2.html');
+        card.onclick = () => openWebOverlay('future-times-2.html');
         card.innerHTML = `
             <div class="media-img"></div>
             <div class="media-info">
@@ -411,18 +412,37 @@
         area.appendChild(card);
     }
 
-    function openOverlay(url) {
+    function openWebOverlay(url) {
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
+        const img = document.getElementById('overlay-image');
+        
         iframe.src = url;
+        iframe.style.display = 'block';
+        img.style.display = 'none';
+        overlay.style.display = 'flex';
+    }
+
+    function openImageOverlay(src) {
+        const overlay = document.getElementById('browser-overlay');
+        const iframe = document.getElementById('browser-iframe');
+        const img = document.getElementById('overlay-image');
+        
+        img.src = src;
+        img.style.display = 'block';
+        iframe.style.display = 'none';
         overlay.style.display = 'flex';
     }
 
     function closeOverlay() {
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
+        const img = document.getElementById('overlay-image');
+        
         overlay.style.display = 'none';
         iframe.src = '';
+        iframe.style.display = 'none';
+        img.style.display = 'none';
     }
 
     function addVoiceBubble(chat) {
