@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Canyon Messenger 2029</title>
     
     <script defer src="https://cloud.umami.is/script.js" data-website-id="dd92207d-a0ed-4644-af2d-d4fa2500f7f8"></script>
@@ -22,13 +22,29 @@
         }
 
         body, html {
-            margin: 0; padding: 0; height: 100%;
+            margin: 0; padding: 0; 
+            /* FIX: Nutzt dvh (Dynamic Viewport Height) falls unterstützt, sonst 100% */
+            height: 100%;
+            height: 100dvh; 
             background-color: var(--bg-black);
             color: var(--text-white);
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
             -webkit-tap-highlight-color: transparent;
             overflow: hidden;
+            position: fixed; /* Verhindert das "Gummiband"-Scrollen des ganzen Bodys */
+            width: 100%;
         }
+
+        /* --- App Layout --- */
+        .app-container { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            width: 100%;
+            position: relative; 
+            visibility: hidden; 
+        }
+        .app-container.visible { visibility: visible; }
 
         /* --- Overlays --- */
         #intro-overlay, #browser-overlay {
@@ -53,45 +69,44 @@
         #overlay-image { max-width: 95%; max-height: 90%; object-fit: contain; display: none; }
         
         .close-overlay-btn {
-            position: absolute; top: 25px; right: 20px;
+            position: absolute; top: calc(25px + env(safe-area-inset-top)); 
+            right: 20px;
             width: 44px; height: 44px; background: #333333;
             color: white; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3);
             font-size: 22px; display: flex; align-items: center; justify-content: center;
             cursor: pointer; z-index: 2100; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
-        .logo-container { width: 80%; max-width: 450px; margin-bottom: 30px; }
-        .canyon-svg { fill: white; width: 100%; height: auto; display: block; }
-        .intro-text { font-size: 18px; color: var(--text-white); margin-bottom: 45px; font-weight: 300; letter-spacing: 1px; opacity: 0.8; }
-        .loader-container { width: 220px; height: 2px; background: #222; border-radius: 2px; overflow: hidden; }
-        .loader-bar { width: 0%; height: 100%; background: var(--text-white); transition: width 5s linear; }
-
         header {
             background-color: var(--bg-black);
-            padding: 15px 0; border-bottom: 0.5px solid var(--border-gray);
+            padding: calc(15px + env(safe-area-inset-top)) 0 15px 0; /* Berücksichtigt Notch */
+            border-bottom: 0.5px solid var(--border-gray);
             z-index: 10; display: flex; justify-content: center; align-items: center;
+            flex-shrink: 0;
         }
         .header-logo-container { height: 18px; width: auto; }
         .header-logo-container svg { height: 100%; width: auto; fill: white; display: block; }
 
         .view {
-            flex: 1; display: flex; flex-direction: column;
-            position: absolute; top: 55px; bottom: 80px; width: 100%;
+            flex: 1; 
+            display: flex; 
+            flex-direction: column;
+            width: 100%;
             background: var(--bg-black);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #listView { z-index: 5; opacity: 1; transform: scale(1); overflow-y: auto; }
-        #detailView { z-index: 6; transform: translateX(100%); opacity: 0; visibility: hidden; }
-        .view-hidden { transform: scale(0.96); opacity: 0; pointer-events: none; }
-        .view-active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; }
-
-        .avatar { 
-            width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: 600; font-size: 18px; flex-shrink: 0; 
-            background-size: cover; background-position: center;
             overflow: hidden;
+            position: relative;
         }
+        
+        #listView { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        #detailView { 
+            position: absolute; top: 0; left: 0; height: 100%; 
+            z-index: 6; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: none; 
+        }
+        .view-active { transform: translateX(0) !important; display: flex !important; }
+
+        /* Avatars */
+        .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; flex-shrink: 0; background-size: cover; background-position: center; overflow: hidden; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
         .chat-item { display: flex; padding: 14px 16px; align-items: center; border-bottom: 0.5px solid var(--border-gray); cursor: pointer; }
@@ -101,9 +116,18 @@
         .chat-list-time { font-size: 12px; color: var(--text-gray); white-space: nowrap; margin-left: 10px; }
         .chat-preview .sub { color: var(--text-gray); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .chat-detail-header { padding: 10px 15px; background: var(--header-dark); display: flex; align-items: center; border-bottom: 0.5px solid var(--border-gray); }
+        .chat-detail-header { padding: 10px 15px; background: var(--header-dark); display: flex; align-items: center; border-bottom: 0.5px solid var(--border-gray); flex-shrink: 0; }
         .back-btn { font-size: 30px; color: var(--accent-blue); padding-right: 15px; cursor: pointer; }
-        .message-area { flex: 1; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-bottom: 30px; }
+        
+        .message-area { 
+            flex: 1; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
         
         .msg-wrapper { display: flex; flex-direction: column; max-width: 85%; animation: msgIn 0.3s ease-out; margin-bottom: 2px; }
         @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -116,33 +140,46 @@
 
         .msg a { color: #58a6ff; text-decoration: underline; }
         
-        .chat-img-bubble {
-            max-width: 240px; border-radius: 15px; overflow: hidden;
-            margin: 5px 0; border: 0.5px solid var(--border-gray);
-            background: var(--message-bot); cursor: pointer;
-        }
+        .chat-img-bubble { max-width: 240px; border-radius: 15px; overflow: hidden; margin: 5px 0; border: 0.5px solid var(--border-gray); background: var(--message-bot); cursor: pointer; flex-shrink: 0; }
         .chat-img-bubble img { width: 100%; height: auto; display: block; }
 
         .media-card {
             background: var(--message-bot); border-radius: 12px; overflow: hidden;
             margin: 5px 0; border: 0.5px solid var(--border-gray); max-width: 280px;
             cursor: pointer;
+            height: 240px; /* Fixe Höhe */
+            flex-shrink: 0;
         }
-        .media-img { width: 100%; height: 160px; background: #f2e6e6 url('ft-cover.png') no-repeat center center; background-size: cover; }
+        .media-img { width: 100%; height: 140px; background: #f2e6e6 url('ft-cover.png') no-repeat center center; background-size: cover; }
         .media-info { padding: 12px; font-size: 13px; line-height: 1.4; }
         .media-source { font-size: 10px; color: var(--text-gray); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.5px;}
 
+        /* --- FIX FÜR IPHONE TOOLBAR BEREICH --- */
         .input-area {
-            background: var(--header-dark); padding: 10px 15px 35px 15px;
-            border-top: 0.5px solid var(--border-gray); display: flex; align-items: center; gap: 10px;
+            background: var(--header-dark); 
+            padding: 10px 15px calc(10px + env(safe-area-inset-bottom)) 15px; /* Dynamischer Padding für iPhone Balken */
+            border-top: 0.5px solid var(--border-gray); 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+            flex-shrink: 0;
         }
         .input-field-container { flex: 1; background: var(--input-bg); border-radius: 22px; padding: 10px 18px; display: flex; align-items: center; }
-        .input-field { border: none; background: transparent; color: var(--text-white); font-size: 15px; width: 100%; outline: none; }
+        .input-field { border: none; background: transparent; color: var(--text-white); font-size: 16px; /* 16px verhindert Auto-Zoom bei iOS Fokus */ width: 100%; outline: none; }
         .send-btn { width: 36px; height: 36px; background: var(--accent-blue); border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .send-btn:disabled { opacity: 0.3; }
         .send-btn svg { fill: white; width: 20px; height: 20px; }
 
-        .tab-bar { height: 80px; background-color: var(--header-dark); border-top: 0.5px solid var(--border-gray); display: flex; justify-content: space-around; align-items: center; padding-bottom: 20px; }
+        .tab-bar { 
+            height: calc(65px + env(safe-area-inset-bottom)); 
+            background-color: var(--header-dark); 
+            border-top: 0.5px solid var(--border-gray); 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: flex-start; 
+            padding-top: 10px;
+            flex-shrink: 0;
+        }
         .tab-item { text-align: center; color: var(--text-gray); font-size: 10px; }
         .tab-item.active { color: var(--text-white); }
         .tab-icon { font-size: 22px; display: block; margin-bottom: 4px; }
@@ -176,24 +213,26 @@
         </div>
     </header>
 
-    <div id="listView" class="view view-active"><div id="chat-list-content"></div></div>
-    
-    <div id="detailView" class="view">
-        <div class="chat-detail-header">
-            <span class="back-btn" onclick="closeChat()">‹</span>
-            <div id="detail-avatar" class="avatar" style="width:36px; height:36px; font-size:14px; margin-right:10px;"></div>
-            <strong id="detail-name">Partner</strong>
-        </div>
-        <div id="message-area" class="message-area"></div>
-        <div id="typing-box" class="typing hidden">schreibt...</div>
+    <div class="view">
+        <div id="listView" class="view view-active"><div id="chat-list-content"></div></div>
         
-        <div class="input-area">
-            <div class="input-field-container">
-                <input type="text" id="chat-input" class="input-field" readonly placeholder="Antwort...">
+        <div id="detailView" class="view" style="position: absolute; top: 0; left: 0; height: 100%; display: none;">
+            <div class="chat-detail-header">
+                <span class="back-btn" onclick="closeChat()">‹</span>
+                <div id="detail-avatar" class="avatar" style="width:36px; height:36px; font-size:14px; margin-right:10px;"></div>
+                <strong id="detail-name">Partner</strong>
             </div>
-            <button id="send-btn" class="send-btn" disabled>
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
+            <div id="message-area" class="message-area"></div>
+            <div id="typing-box" class="typing hidden">schreibt...</div>
+            
+            <div class="input-area">
+                <div class="input-field-container">
+                    <input type="text" id="chat-input" class="input-field" readonly placeholder="Antwort...">
+                </div>
+                <button id="send-btn" class="send-btn" disabled>
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -265,7 +304,7 @@
           "Morgen Roman! Ich bin richtig stolz darauf, was wir gemeinsam geschaffen haben.",
           "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute gemeinsame Ergebnisse erziehlt."
         ],
-        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir endlich unseren Datenschatz heben können.", "r": "Lass uns telefonieren, um die nächste Stufe zu zünden. 💜 Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
+        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir endlich unseren Datenschatz heben können.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
       },
       {
         "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "img": "marketing.png", "isVoice": true,
@@ -302,7 +341,6 @@
         }, 5500);
     }
 
-    // Avatar HTML Generator with Image Fallback Support
     function getAvatarHTML(chat) {
         if (chat.img) {
             return `<div class="avatar" style="background-color:${chat.color}; color:${chat.textColor || 'white'}">
@@ -334,7 +372,7 @@
     }
 
     async function openChat(chat) {
-        document.getElementById('listView').classList.add('view-hidden');
+        document.getElementById('listView').style.display = 'none';
         const detail = document.getElementById('detailView');
         detail.style.display = 'flex';
         setTimeout(() => detail.classList.add('view-active'), 50);
@@ -342,7 +380,6 @@
         const detailAvatar = document.getElementById('detail-avatar');
         document.getElementById('detail-name').innerText = chat.name;
         
-        // Detail Avatar setzen
         if (chat.img) {
             detailAvatar.style.backgroundColor = chat.color;
             detailAvatar.style.color = chat.textColor || 'white';
@@ -381,11 +418,7 @@
             sendBtn.disabled = false;
             sendBtn.onclick = () => handleSend(chat.options[0]);
         }
-
-        // UMAMI Event für Chat-Öffnung
-        if (window.umami) {
-            umami.track('Open Chat', { name: chat.name });
-        }
+        if (window.umami) umami.track('Open Chat', { name: chat.name });
     }
 
     async function handleSend(option) {
@@ -445,13 +478,10 @@
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
         const img = document.getElementById('overlay-image');
-        
         iframe.src = url;
         iframe.style.display = 'block';
         img.style.display = 'none';
         overlay.style.display = 'flex';
-
-        // UMAMI Event für Artikel
         if (window.umami) umami.track('View Article', { url: url });
     }
 
@@ -459,7 +489,6 @@
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
         const img = document.getElementById('overlay-image');
-        
         img.src = src;
         img.style.display = 'block';
         iframe.style.display = 'none';
@@ -470,7 +499,6 @@
         const overlay = document.getElementById('browser-overlay');
         const iframe = document.getElementById('browser-iframe');
         const img = document.getElementById('overlay-image');
-        
         overlay.style.display = 'none';
         iframe.src = '';
         iframe.style.display = 'none';
@@ -503,7 +531,7 @@
         document.getElementById('detailView').classList.remove('view-active');
         setTimeout(() => { 
             document.getElementById('detailView').style.display = 'none'; 
-            document.getElementById('listView').classList.remove('view-hidden'); 
+            document.getElementById('listView').style.display = 'block'; 
         }, 400);
     }
 
