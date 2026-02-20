@@ -22,112 +22,72 @@
         }
 
         body, html {
-            margin: 0; padding: 0; 
-            /* FIX: Nutzt dvh (Dynamic Viewport Height) falls unterstützt, sonst 100% */
-            height: 100%;
-            height: 100dvh; 
+            margin: 0; padding: 0; height: 100%; height: 100dvh; 
             background-color: var(--bg-black);
             color: var(--text-white);
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
             -webkit-tap-highlight-color: transparent;
             overflow: hidden;
-            position: fixed; /* Verhindert das "Gummiband"-Scrollen des ganzen Bodys */
+            position: fixed;
             width: 100%;
         }
 
         /* --- App Layout --- */
-        .app-container { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%; 
-            width: 100%;
-            position: relative; 
-            visibility: hidden; 
-        }
+        .app-container { display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; visibility: hidden; }
         .app-container.visible { visibility: visible; }
 
         /* --- Overlays --- */
-        #intro-overlay, #browser-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1000; display: none; flex-direction: column;
-        }
-        #intro-overlay {
-            background-color: var(--bg-black); align-items: center; justify-content: center;
-            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
-        }
+        #intro-overlay, #browser-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: none; flex-direction: column; }
+        #intro-overlay { background-color: var(--bg-black); align-items: center; justify-content: center; transition: opacity 1.2s, visibility 1.2s; }
         #intro-overlay.active { display: flex; }
         #intro-overlay.fade-out { opacity: 0; visibility: hidden; }
 
-        #browser-overlay {
-            background: rgba(0,0,0,0.95); z-index: 2000;
-            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            justify-content: center; align-items: center;
-        }
+        #browser-overlay { background: rgba(0,0,0,0.95); z-index: 2000; animation: slideUp 0.4s; justify-content: center; align-items: center; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
         #browser-iframe { width: 100%; height: 100%; border: none; background: white; display: none; }
         #overlay-image { max-width: 95%; max-height: 90%; object-fit: contain; display: none; }
         
         .close-overlay-btn {
-            position: absolute; top: calc(25px + env(safe-area-inset-top)); 
-            right: 20px;
-            width: 44px; height: 44px; background: #333333;
-            color: white; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3);
-            font-size: 22px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 2100; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            position: absolute; top: calc(25px + env(safe-area-inset-top)); right: 20px;
+            width: 44px; height: 44px; background: #333333; color: white; border-radius: 50%; 
+            border: 1.5px solid rgba(255,255,255,0.3); font-size: 22px; display: flex; 
+            align-items: center; justify-content: center; cursor: pointer; z-index: 2100;
         }
 
         header {
             background-color: var(--bg-black);
-            padding: calc(15px + env(safe-area-inset-top)) 0 15px 0; /* Berücksichtigt Notch */
+            padding: calc(15px + env(safe-area-inset-top)) 0 15px 0;
             border-bottom: 0.5px solid var(--border-gray);
-            z-index: 10; display: flex; justify-content: center; align-items: center;
-            flex-shrink: 0;
+            z-index: 10; display: flex; justify-content: center; align-items: center; flex-shrink: 0;
         }
         .header-logo-container { height: 18px; width: auto; }
         .header-logo-container svg { height: 100%; width: auto; fill: white; display: block; }
 
+        .view-wrapper { flex: 1; position: relative; width: 100%; overflow: hidden; }
+
         .view {
-            flex: 1; 
-            display: flex; 
-            flex-direction: column;
-            width: 100%;
-            background: var(--bg-black);
-            overflow: hidden;
-            position: relative;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-black); display: flex; flex-direction: column;
         }
         
-        #listView { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        #detailView { 
-            position: absolute; top: 0; left: 0; height: 100%; 
-            z-index: 6; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            display: none; 
-        }
+        #listView { z-index: 5; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        #detailView { z-index: 6; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: none; }
         .view-active { transform: translateX(0) !important; display: flex !important; }
 
         /* Avatars */
-        .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; flex-shrink: 0; background-size: cover; background-position: center; overflow: hidden; }
+        .avatar { width: 52px; height: 52px; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; flex-shrink: 0; overflow: hidden; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
         .chat-item { display: flex; padding: 14px 16px; align-items: center; border-bottom: 0.5px solid var(--border-gray); cursor: pointer; }
-        .chat-preview { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .chat-preview { flex: 1; min-width: 0; }
         .chat-preview-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
-        .chat-preview .name { font-weight: 600; font-size: 16px; color: var(--text-white); }
-        .chat-list-time { font-size: 12px; color: var(--text-gray); white-space: nowrap; margin-left: 10px; }
-        .chat-preview .sub { color: var(--text-gray); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .name { font-weight: 600; font-size: 16px; color: var(--text-white); }
+        .chat-list-time { font-size: 12px; color: var(--text-gray); }
+        .sub { color: var(--text-gray); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .chat-detail-header { padding: 10px 15px; background: var(--header-dark); display: flex; align-items: center; border-bottom: 0.5px solid var(--border-gray); flex-shrink: 0; }
         .back-btn { font-size: 30px; color: var(--accent-blue); padding-right: 15px; cursor: pointer; }
-        
-        .message-area { 
-            flex: 1; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch;
-        }
+        .message-area { flex: 1; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
         .msg-wrapper { display: flex; flex-direction: column; max-width: 85%; animation: msgIn 0.3s ease-out; margin-bottom: 2px; }
         @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -138,56 +98,24 @@
         .user .msg { background: var(--message-user); }
         .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
 
-        .msg a { color: #58a6ff; text-decoration: underline; }
-        
-        .chat-img-bubble { max-width: 240px; border-radius: 15px; overflow: hidden; margin: 5px 0; border: 0.5px solid var(--border-gray); background: var(--message-bot); cursor: pointer; flex-shrink: 0; }
-        .chat-img-bubble img { width: 100%; height: auto; display: block; }
-
-        .media-card {
-            background: var(--message-bot); border-radius: 12px; overflow: hidden;
-            margin: 5px 0; border: 0.5px solid var(--border-gray); max-width: 280px;
-            cursor: pointer;
-            height: 240px; /* Fixe Höhe */
-            flex-shrink: 0;
-        }
+        .chat-img-bubble { max-width: 240px; border-radius: 15px; overflow: hidden; margin: 5px 0; border: 0.5px solid var(--border-gray); flex-shrink: 0; }
+        .media-card { background: var(--message-bot); border-radius: 12px; overflow: hidden; margin: 5px 0; border: 0.5px solid var(--border-gray); max-width: 280px; height: 240px; flex-shrink: 0; }
         .media-img { width: 100%; height: 140px; background: #f2e6e6 url('ft-cover.png') no-repeat center center; background-size: cover; }
         .media-info { padding: 12px; font-size: 13px; line-height: 1.4; }
-        .media-source { font-size: 10px; color: var(--text-gray); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.5px;}
 
-        /* --- FIX FÜR IPHONE TOOLBAR BEREICH --- */
         .input-area {
             background: var(--header-dark); 
-            padding: 10px 15px calc(10px + env(safe-area-inset-bottom)) 15px; /* Dynamischer Padding für iPhone Balken */
+            padding: 10px 15px calc(15px + env(safe-area-inset-bottom)) 15px;
             border-top: 0.5px solid var(--border-gray); 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-            flex-shrink: 0;
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
         }
-        .input-field-container { flex: 1; background: var(--input-bg); border-radius: 22px; padding: 10px 18px; display: flex; align-items: center; }
-        .input-field { border: none; background: transparent; color: var(--text-white); font-size: 16px; /* 16px verhindert Auto-Zoom bei iOS Fokus */ width: 100%; outline: none; }
-        .send-btn { width: 36px; height: 36px; background: var(--accent-blue); border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .input-field-container { flex: 1; background: var(--input-bg); border-radius: 22px; padding: 10px 18px; }
+        .input-field { border: none; background: transparent; color: var(--text-white); font-size: 16px; width: 100%; outline: none; }
+        .send-btn { width: 36px; height: 36px; background: var(--accent-blue); border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; }
         .send-btn:disabled { opacity: 0.3; }
-        .send-btn svg { fill: white; width: 20px; height: 20px; }
-
-        .tab-bar { 
-            height: calc(65px + env(safe-area-inset-bottom)); 
-            background-color: var(--header-dark); 
-            border-top: 0.5px solid var(--border-gray); 
-            display: flex; 
-            justify-content: space-around; 
-            align-items: flex-start; 
-            padding-top: 10px;
-            flex-shrink: 0;
-        }
-        .tab-item { text-align: center; color: var(--text-gray); font-size: 10px; }
-        .tab-item.active { color: var(--text-white); }
-        .tab-icon { font-size: 22px; display: block; margin-bottom: 4px; }
-        .hidden { display: none; }
+        
         .typing { font-size: 12px; color: var(--text-gray); margin: 5px 0 0 15px; font-style: italic; }
-
-        .voice-bubble { background: var(--message-bot); padding: 12px; border-radius: 20px; display: flex; align-items: center; gap: 12px; min-width: 220px; cursor: pointer; }
-        .play-btn-circle { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: none; font-size: 14px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -213,10 +141,10 @@
         </div>
     </header>
 
-    <div class="view">
-        <div id="listView" class="view view-active"><div id="chat-list-content"></div></div>
+    <div class="view-wrapper">
+        <div id="listView" class="view"><div id="chat-list-content"></div></div>
         
-        <div id="detailView" class="view" style="position: absolute; top: 0; left: 0; height: 100%; display: none;">
+        <div id="detailView" class="view">
             <div class="chat-detail-header">
                 <span class="back-btn" onclick="closeChat()">‹</span>
                 <div id="detail-avatar" class="avatar" style="width:36px; height:36px; font-size:14px; margin-right:10px;"></div>
@@ -230,18 +158,11 @@
                     <input type="text" id="chat-input" class="input-field" readonly placeholder="Antwort...">
                 </div>
                 <button id="send-btn" class="send-btn" disabled>
-                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                 </button>
             </div>
         </div>
     </div>
-
-    <nav class="tab-bar">
-        <div class="tab-item"><span class="tab-icon">👤</span>Contacts</div>
-        <div class="tab-item"><span class="tab-icon">📞</span>Calls</div>
-        <div class="tab-item active"><span class="tab-icon">💬</span>Chats</div>
-        <div class="tab-item"><span class="tab-icon">⚙️</span>Settings</div>
-    </nav>
 </div>
 
 <audio id="voice-audio"></audio>
@@ -259,63 +180,49 @@
       },
       {
         "id": 7, "name": "Sarah", "initial": "S", "color": "#8b5cf6", "sub": "Community Managerin", "img": "sarah.png",
-        "initialMessages": ["Roman! NPS auf Rekordhoch. 📈", "KI löst Standard-Themen und wir haben Zeit für echte Geschichten.", "Feedback bleibt unser wichtigster Input!"],
+        "initialMessages": ["Roman! NPS auf Rekordhoch. 📈", "KI löst Standard-Themen und wir haben Zeit für echte Geschichten."],
         "options": [{ "t": "Genau, also wie immer: Schick mir Montag die kritischen Stimmen.", "r": "Keine Sorge, die Montags-Runde bleibt heilig. 😉" }]
       },
       {
         "id": 6, "name": "Rad Race", "initial": "RR", "color": "#10b981", "sub": "Best Canyon Service", "img": "radrace.png",
-        "initialMessages": [
-          "Hey Roman, mega, was ihr in den letzten Jahren mit dem Neustart der Service Plattform erreicht habt!",
-          "Es macht richtig Spaß mit euch zu arbeiten, weil wir immer top im Vorfeld zu den Riders und den Bikes informiert sind, die zu uns in die Werkstatt kommen."
-        ],
-        "options": [{ "t": "Super, freut mich, dass ihr mit Canyon wachsen könnt. Ihr seid für uns ein ganz wichtiger Erfolgsfaktor!", "r": "'Pure Cycling' bis in die letzte Schraube. Gerne zeige ich dir mal unsere neue Werkstatt in München. Wann passt es dir?" }]
+        "initialMessages": ["Hey Roman, mega, was ihr erreicht habt!", "Es macht richtig Spaß mit euch zu arbeiten."],
+        "options": [{ "t": "Super, freut mich!", "r": "'Pure Cycling' bis in die letzte Schraube." }]
       },
       {
         "id": 2, "name": "GBL Stratege", "initial": "GS", "color": "#ef4444", "sub": "Turn-Around", "img": "gbl.png",
-        "initialMessages": [
-          "Glückwunsch zum Turn-Around! 🥂",
-          "Die Entscheidungen in 2026 waren genau richtig - der Invest zahlt sich nun aus.",
-          "Press: Future Times (Picture embedded) - Headline: Canyon verdoppelt den Unternehmenswert in 4 Jahren."
-        ],
-        "options": [{ "t": "Danke für euren Support in schwierigen Zeiten!", "r": "Canyon ist wieder Top 3 in unserem Portfolio! Lass uns diesen Weg gemeinsam weitergehen!" }]
+        "initialMessages": ["Glückwunsch zum Turn-Around! 🥂", "Die Entscheidungen 2026 waren richtig.", "Press: Future Times (Picture embedded)"],
+        "options": [{ "t": "Danke!", "r": "Lass uns diesen Weg gemeinsam weitergehen!" }]
       },
       {
         "id": 1, "name": "Mathieu", "initial": "M", "color": "#ffffff", "textColor": "#01326F", "sub": "Unser Weltmeister 🌈", "img": "mathieu.png",
-        "initialMessages": [
-          "Hey Roman! 🌈 Nächster Titel... Wahnsinn.",
-          "Danke für eure Innovationen der letzen Jahre. Es macht mich so stolz ein Gesicht des Canyon-Teams zu sein.",
-          "Meine Vielseitigkeit, eure Performance - unschlagbar! 🏆"
-        ],
-        "options": [{ "t": "Glückwunsch! 👑 Wir haben das Fundament gebaut, fliegen musstest du!", "r": "Tolle Teamleistung der Canyon-Familie. Bis bald! 🥂" }]
+        "initialMessages": ["Hey Roman! 🌈 Nächster Titel... Wahnsinn."],
+        "options": [{ "t": "Glückwunsch!", "r": "Tolle Teamleistung." }]
       },
       {
         "id": 5, "name": "LeBron James", "initial": "LJ", "color": "#f59e0b", "sub": "LBJ Legacy Bike", "img": "lebron.png",
-        "initialMessages": ["Yo Roman! 🏀 R126 has gone live! The campaign is on point in the US, sales is skyrocketing!"],
-        "options": [{ "t": "King James! 👑 Fantastic! Our approach to understand our riders even better takes off! I'm very proud of our achievements", "r": "Me too, Roman. Wanna join me on a ride in LA together with Mark Allen?" }]
+        "initialMessages": ["Yo Roman! 🏀 R126 has gone live!"],
+        "options": [{ "t": "Fantastic!", "r": "Me too, Roman." }]
       },
       {
         "id": 9, "name": "CFO", "initial": "CF", "color": "#64748b", "sub": "TCO & Margen", "img": "cfo.png",
-        "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉", "15 Altsysteme weg. Geld fließt direkt in die neue F&E.", "So macht Optimieren Spaß, weil Werte entstehen!"],
-        "options": [{ "t": "Weniger Silos = mehr Freiheit für Entwicklung. Ich hätte nie gedacht, dass wir so viel Potenzial heben können.", "r": "Ich hab's dir doch immer gesagt. 📈 Wie immer? Abendrunde Mittwoch 18 Uhr?" }]
+        "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉"],
+        "options": [{ "t": "Weniger Silos = mehr Freiheit.", "r": "Ich hab's dir immer gesagt." }]
       },
       {
-        "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#C300FF", "textColor": "#ffffff", "sub": "We Create CX Champions", "img": "thilo.png",
-        "initialMessages": [
-          "Morgen Roman! Ich bin richtig stolz darauf, was wir gemeinsam geschaffen haben.",
-          "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute gemeinsame Ergebnisse erziehlt."
-        ],
-        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir endlich unseren Datenschatz heben können.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
+        "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#C300FF", "textColor": "#ffffff", "sub": "CX Champions", "img": "thilo.png",
+        "initialMessages": ["Morgen Roman!", "Stolz auf unsere Ergebnisse."],
+        "options": [{ "t": "Datenschatz gehoben.", "r": "💜 Lass uns telefonieren: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
       },
       {
-        "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "img": "marketing.png", "isVoice": true,
-        "voiceTxt": "Hi Roman! WOW! Wie haben wir das früher ohne die SAP Data Platform gemacht? Unbezahlbar, so nah am Rider zu sein. Mega!",
+        "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht", "img": "marketing.png", "isVoice": true,
+        "voiceTxt": "Hi Roman! WOW!",
         "initialMessages": ["🎤 Sprachnachricht empfangen"],
-        "options": [{ "t": "Data is king! 🦾 Wie hat sich der Customer Lifetime Value entwickelt?", "r": "Über 25% gestiegen dank unserer Fokusussierung 2026! 📈 Unsere Rider und die Community spüren die Leidenschaft. Echte Loyalität!" }]
+        "options": [{ "t": "Data is king!", "r": "Echte Loyalität!" }]
       },
       {
         "id": 8, "name": "Shanghai Store", "initial": "SH", "color": "#3b82f6", "sub": "Skalierung Asien", "img": "shanghai.png",
-        "initialMessages": ["Grüße aus Shanghai! 🇨🇳 MyCanyon ist der Wahnsinn.", "Das Custom-Rad ist schneller beim Kunden als je zuvor.", "Die neuen Systeme haben unsere Skalierung überhaupt erst möglich gemacht. Ich hätte nie gedacht, dass wir so schnell handlungsfähig werden."],
-        "options": [{ "t": "Shanghai ist ein Schlüsselmarkt. Der Backbone war ein wichtiger Hebel.", "r": "Absolut! War die beste Entscheidung der letzten Jahre. Wir sind unschlagbar." }]
+        "initialMessages": ["Grüße aus Shanghai! 🇨🇳"],
+        "options": [{ "t": "Ein wichtiger Hebel.", "r": "Absolut!" }]
       }
     ];
 
@@ -323,9 +230,7 @@
 
     function getTimestamp() {
         const now = new Date();
-        const hrs = now.getHours().toString().padStart(2, '0');
-        const min = now.getMinutes().toString().padStart(2, '0');
-        return `${hrs}:${min} (18.02.2029)`;
+        return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} (18.02.2029)`;
     }
 
     function startApp() {
@@ -359,13 +264,9 @@
             item.innerHTML = `
                 ${getAvatarHTML(chat)}
                 <div class="chat-preview">
-                    <div class="chat-preview-top">
-                        <span class="name">${chat.name}</span>
-                        <span class="chat-list-time">${getTimestamp()}</span>
-                    </div>
+                    <div class="chat-preview-top"><span class="name">${chat.name}</span><span class="chat-list-time">${getTimestamp()}</span></div>
                     <span class="sub">${chat.isVoice ? '🎤 Sprachnachricht' : chat.sub}</span>
-                </div>
-            `;
+                </div>`;
             item.onclick = () => openChat(chat);
             list.appendChild(item);
         });
@@ -379,21 +280,14 @@
         
         const detailAvatar = document.getElementById('detail-avatar');
         document.getElementById('detail-name').innerText = chat.name;
-        
-        if (chat.img) {
-            detailAvatar.style.backgroundColor = chat.color;
-            detailAvatar.style.color = chat.textColor || 'white';
-            detailAvatar.innerHTML = `<img src="${chat.img}" onerror="this.style.display='none'; this.parentElement.innerText='${chat.initial}'">`;
-        } else {
-            detailAvatar.innerText = chat.initial;
-            detailAvatar.style.background = chat.color;
-            detailAvatar.style.color = chat.textColor || 'white';
-        }
+        detailAvatar.innerHTML = chat.img ? `<img src="${chat.img}" onerror="this.style.display='none'; this.parentElement.innerText='${chat.initial}'">` : chat.initial;
+        detailAvatar.style.backgroundColor = chat.color;
         
         const area = document.getElementById('message-area');
+        area.innerHTML = '';
         const input = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
-        area.innerHTML = ''; input.value = ''; sendBtn.disabled = true;
+        input.value = ''; sendBtn.disabled = true;
 
         for (let i = 0; i < chat.initialMessages.length; i++) {
             document.getElementById('typing-box').classList.remove('hidden');
@@ -401,15 +295,10 @@
             document.getElementById('typing-box').classList.add('hidden');
             
             const msgText = chat.initialMessages[i];
-            if (msgText === "SHOW_PRODUCT_IMAGE") {
-                addProductImage();
-            } else if (msgText.includes("Future Times") || msgText.includes("Financial Times")) {
-                addMediaLink();
-            } else if (chat.isVoice && i === 0) {
-                addVoiceBubble(chat);
-            } else {
-                addMsg(msgText, 'bot');
-            }
+            if (msgText === "SHOW_PRODUCT_IMAGE") { addProductImage(); } 
+            else if (msgText.includes("Future Times")) { addMediaLink(); } 
+            else if (chat.isVoice && i === 0) { addVoiceBubble(chat); } 
+            else { addMsg(msgText, 'bot'); }
             area.scrollTop = area.scrollHeight;
         }
 
@@ -422,12 +311,9 @@
     }
 
     async function handleSend(option) {
-        const input = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-btn');
         addMsg(option.t, 'user');
-        input.value = '';
-        sendBtn.disabled = true;
-
+        document.getElementById('chat-input').value = '';
+        document.getElementById('send-btn').disabled = true;
         setTimeout(async () => {
             document.getElementById('typing-box').classList.remove('hidden');
             await new Promise(r => setTimeout(r, 1400));
@@ -438,24 +324,20 @@
 
     function addMsg(txt, type) {
         const area = document.getElementById('message-area');
-        const wrapper = document.createElement('div');
-        wrapper.className = `msg-wrapper ${type}`;
-        wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">${getTimestamp()}</div>`;
-        area.appendChild(wrapper);
+        const div = document.createElement('div');
+        div.className = `msg-wrapper ${type}`;
+        div.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">${getTimestamp()}</div>`;
+        area.appendChild(div);
         area.scrollTop = area.scrollHeight;
     }
 
     function addProductImage() {
         const area = document.getElementById('message-area');
-        const wrapper = document.createElement('div');
-        wrapper.className = 'bot';
-        wrapper.innerHTML = `
-            <div class="chat-img-bubble" onclick="openImageOverlay('aeroad.png')">
-                <img src="aeroad.png" alt="Canyon Aeroad">
-            </div>
-            <div class="timestamp" style="margin-top: -5px; margin-bottom: 10px;">${getTimestamp()}</div>
-        `;
-        area.appendChild(wrapper);
+        const div = document.createElement('div');
+        div.className = 'bot';
+        div.innerHTML = `<div class="chat-img-bubble" onclick="openImageOverlay('aeroad.png')"><img src="aeroad.png"></div><div class="timestamp">${getTimestamp()}</div>`;
+        area.appendChild(div);
+        area.scrollTop = area.scrollHeight;
     }
 
     function addMediaLink() {
@@ -463,71 +345,46 @@
         const card = document.createElement('div');
         card.className = 'media-card';
         card.onclick = () => openWebOverlay('future-times-2.html');
-        card.innerHTML = `
-            <div class="media-img"></div>
-            <div class="media-info">
-                <div class="media-source">Future Times</div>
-                <strong>Canyon verdoppelt den Unternehmenswert in 4 Jahren</strong>
-                <p style="margin:4px 0 0 0; color:var(--text-gray); font-size:11px;">The Big Read: Wie Roman Arnold den Weltmarkt durch technologische Transformation erobert...</p>
-            </div>
-        `;
+        card.innerHTML = `<div class="media-img"></div><div class="media-info"><strong>Canyon verdoppelt Wert</strong></div>`;
         area.appendChild(card);
+        area.scrollTop = area.scrollHeight;
     }
 
     function openWebOverlay(url) {
-        const overlay = document.getElementById('browser-overlay');
-        const iframe = document.getElementById('browser-iframe');
-        const img = document.getElementById('overlay-image');
-        iframe.src = url;
-        iframe.style.display = 'block';
-        img.style.display = 'none';
-        overlay.style.display = 'flex';
+        document.getElementById('browser-iframe').src = url;
+        document.getElementById('browser-iframe').style.display = 'block';
+        document.getElementById('overlay-image').style.display = 'none';
+        document.getElementById('browser-overlay').style.display = 'flex';
         if (window.umami) umami.track('View Article', { url: url });
     }
 
     function openImageOverlay(src) {
-        const overlay = document.getElementById('browser-overlay');
-        const iframe = document.getElementById('browser-iframe');
-        const img = document.getElementById('overlay-image');
-        img.src = src;
-        img.style.display = 'block';
-        iframe.style.display = 'none';
-        overlay.style.display = 'flex';
+        document.getElementById('overlay-image').src = src;
+        document.getElementById('overlay-image').style.display = 'block';
+        document.getElementById('browser-iframe').style.display = 'none';
+        document.getElementById('browser-overlay').style.display = 'flex';
     }
 
     function closeOverlay() {
-        const overlay = document.getElementById('browser-overlay');
-        const iframe = document.getElementById('browser-iframe');
-        const img = document.getElementById('overlay-image');
-        overlay.style.display = 'none';
-        iframe.src = '';
-        iframe.style.display = 'none';
-        img.style.display = 'none';
+        document.getElementById('browser-overlay').style.display = 'none';
+        document.getElementById('browser-iframe').src = '';
     }
 
     function addVoiceBubble(chat) {
         const area = document.getElementById('message-area');
-        const wrapper = document.createElement('div');
-        wrapper.className = `msg-wrapper bot`;
-        wrapper.innerHTML = `<div class="voice-bubble" onclick="toggleAudio(this)"><button class="play-btn-circle">▶</button><div style="flex:1; height:4px; background:#444; border-radius:2px;"></div><span style="font-size:11px;">0:14</span></div><div style="font-size:12px; margin-top:8px; color:var(--text-gray); font-style:italic;">"${chat.voiceTxt}"</div>`;
-        area.appendChild(wrapper);
-        audioPlayer.onended = () => { const btn = document.querySelector('.play-btn-circle'); if(btn) btn.innerText = '▶'; };
+        const div = document.createElement('div');
+        div.className = `msg-wrapper bot`;
+        div.innerHTML = `<div class="voice-bubble" onclick="toggleAudio(this)"><button class="play-btn-circle">▶</button></div>`;
+        area.appendChild(div);
+        area.scrollTop = area.scrollHeight;
     }
 
     function toggleAudio(container) {
-        const btn = container.querySelector('.play-btn-circle');
-        if (audioPlayer.paused) {
-            audioPlayer.src = 'BDC.wav';
-            audioPlayer.play().then(() => { btn.innerText = '⏸'; }).catch(e => console.log("Audio blockiert"));
-        } else {
-            audioPlayer.pause();
-            btn.innerText = '▶';
-        }
+        audioPlayer.src = 'BDC.wav';
+        audioPlayer.play();
     }
 
     function closeChat() {
-        audioPlayer.pause();
-        audioPlayer.currentTime = 0;
         document.getElementById('detailView').classList.remove('view-active');
         setTimeout(() => { 
             document.getElementById('detailView').style.display = 'none'; 
