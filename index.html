@@ -105,16 +105,23 @@
         .user .msg { background: var(--message-user); }
         .timestamp { font-size: 10px; color: var(--text-gray); margin-top: 4px; padding: 0 5px; }
 
-        /* Links in Messages */
+        /* Links & Media in Messages */
         .msg a { color: #58a6ff; text-decoration: underline; }
+        
+        .chat-img-bubble {
+            max-width: 240px; border-radius: 15px; overflow: hidden;
+            margin: 5px 0; border: 0.5px solid var(--border-gray);
+            background: var(--message-bot);
+        }
+        .chat-img-bubble img { width: 100%; height: auto; display: block; }
 
-        /* Media Card */
+        /* Media Card (Future Times) */
         .media-card {
             background: var(--message-bot); border-radius: 12px; overflow: hidden;
             margin: 5px 0; border: 0.5px solid var(--border-gray); max-width: 280px;
             cursor: pointer;
         }
-        .media-img { width: 100%; height: 160px; background: #f2e6e6 url('ft-cover.jpg') no-repeat center center; background-size: cover; }
+        .media-img { width: 100%; height: 160px; background: #f2e6e6 url('ft-cover.png') no-repeat center center; background-size: cover; }
         .media-info { padding: 12px; font-size: 13px; line-height: 1.4; }
         .media-source { font-size: 10px; color: var(--text-gray); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.5px;}
 
@@ -197,8 +204,12 @@
     const chatData = [
       {
         "id": 10, "name": "Stammkunde", "initial": "R", "color": "#94a3b8", "sub": "Neues Aeroad",
-        "initialMessages": ["Hi Roman, mein neues Aeroad kam an. Euer Bike Fitting Service begeistert!", "Stack und Reach passen perfekt. Das ist Perfektion."],
-        "options": [{ "t": "Genau das war der Plan: Ein System, das den Rider perfekt kennt. Danke!", "r": "Beratung wie früher in der Garage – nur digital. 📸" }]
+        "initialMessages": [
+            "Hi Roman, mein neues Aeroad kam an. Euer Bike Fitting Service begeistert!",
+            "SHOW_PRODUCT_IMAGE",
+            "Stack und Reach passen perfekt. Das ist Perfektion."
+        ],
+        "options": [{ "t": "Genau das war der Plan: Ein System, das den Rider perfekt kennt. Danke für deine Treue!", "r": "Beratung wie früher in der Garage – nur digital. 📸" }]
       },
       {
         "id": 7, "name": "Sarah", "initial": "S", "color": "#8b5cf6", "sub": "Community Managerin",
@@ -208,17 +219,17 @@
       {
         "id": 6, "name": "Rad Race", "initial": "RR", "color": "#10b981", "sub": "Best Canyon Service",
         "initialMessages": [
-          "Hey Roman, mega, was ihr mit dem Neustart der Service Plattform erreicht habt!",
-          "Es macht richtig Spaß mit euch zu arbeiten, weil wir immer top informiert sind über Rider und Bikes."
+          "Hey Roman, mega, was ihr in den letzten Jahren mit dem Neustart der Service Plattform erreicht habt!",
+          "Es macht richtig Spaß mit euch zu arbeiten, weil wir immer top im Vorfeld zu den Riders und den Bikes informiert sind, die zu uns in die Werkstatt kommen."
         ],
-        "options": [{ "t": "Super, freut mich, dass ihr mit Canyon wachsen könnt. Ihr seid für uns ein wichtiger Erfolgsfaktor!", "r": "'Pure Cycling' bis in die letzte Schraube. Gerne zeige ich dir unsere neue Werkstatt in München." }]
+        "options": [{ "t": "Super, freut mich, dass ihr mit Canyon wachsen könnt. Ihr seid für uns ein ganz wichtiger Erfolgsfaktor!", "r": "'Pure Cycling' bis in die letzte Schraube. Gerne zeige ich dir mal unsere neue Werkstatt in München. Wann passt es dir?" }]
       },
       {
         "id": 2, "name": "GBL Stratege", "initial": "GS", "color": "#ef4444", "sub": "Turn-Around",
         "initialMessages": [
           "Glückwunsch zum Turn-Around! 🥂",
           "Die Entscheidungen in 2026 waren genau richtig - der Invest zahlt sich nun aus.",
-          "Press: Financial Times (Picture embedded) - Headline: Canyon verdoppelt den Unternehmenswert in 4 Jahren."
+          "Press: Future Times (Picture embedded) - Headline: Canyon verdoppelt den Unternehmenswert in 4 Jahren."
         ],
         "options": [{ "t": "Danke für euren Support in schwierigen Zeiten!", "r": "Canyon ist wieder Top 3 in unserem Portfolio! Lass uns diesen Weg gemeinsam weitergehen!" }]
       },
@@ -234,30 +245,30 @@
       {
         "id": 5, "name": "LeBron James", "initial": "LJ", "color": "#f59e0b", "sub": "LBJ Legacy Bike",
         "initialMessages": ["Yo Roman! 🏀 R126 has gone live! The campaign is on point in the US, sales is skyrocketing!"],
-        "options": [{ "t": "King James! 👑 Fantastic! Our approach to understand our riders even better takes off! I'm proud.", "r": "Me too, Roman. Wanna join me on a ride in LA together with Mark Allen?" }]
+        "options": [{ "t": "King James! 👑 Fantastic! Our approach to understand our riders even better takes off! I'm very proud of our achievements", "r": "Me too, Roman. Wanna join me on a ride in LA together with Mark Allen?" }]
       },
       {
         "id": 9, "name": "CFO", "initial": "CF", "color": "#64748b", "sub": "TCO & Margen",
-        "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉", "15 Altsysteme weg. Geld fließt direkt in die neue F&E.", "So macht Optimieren Spaß!"],
-        "options": [{ "t": "Weniger Silos = mehr Freiheit für Entwicklung. Enormes Potenzial.", "r": "Ich hab's dir immer gesagt. 📈 Wie immer? Abendrunde Mittwoch 18 Uhr?" }]
+        "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉", "15 Altsysteme weg. Geld fließt direkt in die neue F&E.", "So macht Optimieren Spaß, weil Werte entstehen!"],
+        "options": [{ "t": "Weniger Silos = mehr Freiheit für Entwicklung. Ich hätte nie gedacht, dass wir so viel Potenzial heben können.", "r": "Ich hab's dir doch immer gesagt. 📈 Wie immer? Abendrunde Mittwoch 18 Uhr?" }]
       },
       {
         "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#C300FF", "textColor": "#ffffff", "sub": "We Create CX Champions",
         "initialMessages": [
           "Morgen Roman! Ich bin richtig stolz darauf, was wir gemeinsam geschaffen haben.",
-          "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute Ergebnisse erzielt."
+          "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute gemeinsame Ergebnisse erziehlt."
         ],
-        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir unseren Datenschatz gehoben.", "r": "Lass uns telefonieren, um die nächste Stufe zu zünden. 💜 Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
+        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir endlich unseren Datenschatz heben können.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
       },
       {
         "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "isVoice": true,
         "voiceTxt": "Hi Roman! WOW! Wie haben wir das früher ohne die SAP Data Platform gemacht? Unbezahlbar, so nah am Rider zu sein. Mega!",
         "initialMessages": ["🎤 Sprachnachricht empfangen"],
-        "options": [{ "t": "Data is king! 🦾 Wie hat sich der Customer Lifetime Value entwickelt?", "r": "Über 25% gestiegen dank unserer Fokussierung 2026! 📈 Unsere Rider spüren die Leidenschaft. Echte Loyalität!" }]
+        "options": [{ "t": "Data is king! 🦾 Wie hat sich der Customer Lifetime Value entwickelt?", "r": "Über 25% gestiegen dank unserer Fokussierung 2026! 📈 Unsere Rider und die Community spüren die Leidenschaft. Echte Loyalität!" }]
       },
       {
         "id": 8, "name": "Shanghai Store", "initial": "SH", "color": "#3b82f6", "sub": "Skalierung Asien",
-        "initialMessages": ["Grüße aus Shanghai! 🇨🇳 MyCanyon ist der Wahnsinn.", "Das Custom-Rad ist schneller beim Kunden als je zuvor.", "Die neuen Systeme haben unsere Skalierung erst möglich gemacht."],
+        "initialMessages": ["Grüße aus Shanghai! 🇨🇳 MyCanyon ist der Wahnsinn.", "Das Custom-Rad ist schneller beim Kunden als je zuvor.", "Die neuen Systeme haben unsere Skalierung überhaupt erst möglich gemacht. Ich hätte nie gedacht, dass wir so schnell handlungsfähig werden."],
         "options": [{ "t": "Shanghai ist ein Schlüsselmarkt. Der Backbone war ein wichtiger Hebel.", "r": "Absolut! War die beste Entscheidung der letzten Jahre. Wir sind unschlagbar." }]
       }
     ];
@@ -328,7 +339,9 @@
             document.getElementById('typing-box').classList.add('hidden');
             
             const msgText = chat.initialMessages[i];
-            if (msgText.includes("Financial Times")) {
+            if (msgText === "SHOW_PRODUCT_IMAGE") {
+                addProductImage();
+            } else if (msgText.includes("Future Times") || msgText.includes("Financial Times")) {
                 addMediaLink();
             } else if (chat.isVoice && i === 0) {
                 addVoiceBubble(chat);
@@ -367,6 +380,19 @@
         wrapper.innerHTML = `<div class="msg">${txt}</div><div class="timestamp">${getTimestamp()}</div>`;
         area.appendChild(wrapper);
         area.scrollTop = area.scrollHeight;
+    }
+
+    function addProductImage() {
+        const area = document.getElementById('message-area');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bot';
+        wrapper.innerHTML = `
+            <div class="chat-img-bubble">
+                <img src="aeroad.png" alt="Canyon Aeroad">
+            </div>
+            <div class="timestamp" style="margin-top: -5px; margin-bottom: 10px;">${getTimestamp()}</div>
+        `;
+        area.appendChild(wrapper);
     }
 
     function addMediaLink() {
