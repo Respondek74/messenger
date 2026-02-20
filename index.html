@@ -196,13 +196,22 @@
 <script>
     const chatData = [
       {
-        "id": 1, "name": "Mathieu", "initial": "M", "color": "#ffffff", "textColor": "#01326F", "sub": "Unser Weltmeister 🌈",
+        "id": 10, "name": "Stammkunde", "initial": "R", "color": "#94a3b8", "sub": "Neues Aeroad",
+        "initialMessages": ["Hi Roman, mein neues Aeroad kam an. Euer Bike Fitting Service begeistert!", "Stack und Reach passen perfekt. Das ist Perfektion."],
+        "options": [{ "t": "Genau das war der Plan: Ein System, das den Rider perfekt kennt. Danke!", "r": "Beratung wie früher in der Garage – nur digital. 📸" }]
+      },
+      {
+        "id": 7, "name": "Sarah", "initial": "S", "color": "#8b5cf6", "sub": "Community Managerin",
+        "initialMessages": ["Roman! NPS auf Rekordhoch. 📈", "KI löst Standard-Themen und wir haben Zeit für echte Geschichten.", "Feedback bleibt unser wichtigster Input!"],
+        "options": [{ "t": "Genau, also wie immer: Schick mir Montag die kritischen Stimmen.", "r": "Keine Sorge, die Montags-Runde bleibt heilig. 😉" }]
+      },
+      {
+        "id": 6, "name": "Rad Race", "initial": "RR", "color": "#10b981", "sub": "Best Canyon Service",
         "initialMessages": [
-          "Hey Roman! 🌈 Nächster Titel... Wahnsinn.",
-          "Danke für eure Innovationen der letzen Jahre. Es macht mich so stolz ein Gesicht des Canyon-Teams zu sein.",
-          "Meine Vielseitigkeit, eure Performance - unschlagbar! 🏆"
+          "Hey Roman, mega, was ihr mit dem Neustart der Service Plattform erreicht habt!",
+          "Es macht richtig Spaß mit euch zu arbeiten, weil wir immer top informiert sind über Rider und Bikes."
         ],
-        "options": [{ "t": "Glückwunsch! 👑 Wir haben das Fundament gebaut, fliegen musstest du!", "r": "Tolle Teamleistung der Canyon-Familie. Bis bald! 🥂" }]
+        "options": [{ "t": "Super, freut mich, dass ihr mit Canyon wachsen könnt. Ihr seid für uns ein wichtiger Erfolgsfaktor!", "r": "'Pure Cycling' bis in die letzte Schraube. Gerne zeige ich dir unsere neue Werkstatt in München." }]
       },
       {
         "id": 2, "name": "GBL Stratege", "initial": "GS", "color": "#ef4444", "sub": "Turn-Around",
@@ -214,12 +223,31 @@
         "options": [{ "t": "Danke für euren Support in schwierigen Zeiten!", "r": "Canyon ist wieder Top 3 in unserem Portfolio! Lass uns diesen Weg gemeinsam weitergehen!" }]
       },
       {
-        "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#01326F", "sub": "We Create CX Champions",
+        "id": 1, "name": "Mathieu", "initial": "M", "color": "#ffffff", "textColor": "#01326F", "sub": "Unser Weltmeister 🌈",
+        "initialMessages": [
+          "Hey Roman! 🌈 Nächster Titel... Wahnsinn.",
+          "Danke für eure Innovationen der letzen Jahre. Es macht mich so stolz ein Gesicht des Canyon-Teams zu sein.",
+          "Meine Vielseitigkeit, eure Performance - unschlagbar! 🏆"
+        ],
+        "options": [{ "t": "Glückwunsch! 👑 Wir haben das Fundament gebaut, fliegen musstest du!", "r": "Tolle Teamleistung der Canyon-Familie. Bis bald! 🥂" }]
+      },
+      {
+        "id": 5, "name": "LeBron James", "initial": "LJ", "color": "#f59e0b", "sub": "LBJ Legacy Bike",
+        "initialMessages": ["Yo Roman! 🏀 R126 has gone live! The campaign is on point in the US, sales is skyrocketing!"],
+        "options": [{ "t": "King James! 👑 Fantastic! Our approach to understand our riders even better takes off! I'm proud.", "r": "Me too, Roman. Wanna join me on a ride in LA together with Mark Allen?" }]
+      },
+      {
+        "id": 9, "name": "CFO", "initial": "CF", "color": "#64748b", "sub": "TCO & Margen",
+        "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉", "15 Altsysteme weg. Geld fließt direkt in die neue F&E.", "So macht Optimieren Spaß!"],
+        "options": [{ "t": "Weniger Silos = mehr Freiheit für Entwicklung. Enormes Potenzial.", "r": "Ich hab's dir immer gesagt. 📈 Wie immer? Abendrunde Mittwoch 18 Uhr?" }]
+      },
+      {
+        "id": 3, "name": "Thilo Kerner (Sybit)", "initial": "TK", "color": "#C300FF", "textColor": "#ffffff", "sub": "We Create CX Champions",
         "initialMessages": [
           "Morgen Roman! Ich bin richtig stolz darauf, was wir gemeinsam geschaffen haben.",
           "Aus unserem Versprechen 2026 wurde nun Realität. Unsere Teams haben unheimlich gute Ergebnisse erzielt."
         ],
-        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir unseren Datenschatz gehoben.", "r": "💜 Lass uns telefonieren, um die nächste Stufe zu zünden. Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
+        "options": [{ "t": "Danke Thilo! Ohne eure Hilfe hätten wir heute noch riesige interne Aufwände. Jetzt haben wir unseren Datenschatz gehoben.", "r": "Lass uns telefonieren, um die nächste Stufe zu zünden. 💜 Hier meine Nummer: <a href='tel:+491752957364'>+49 1752 957364</a>." }]
       },
       {
         "id": 4, "name": "Marketing Team", "initial": "MT", "color": "#ec4899", "sub": "🎤 Sprachnachricht (0:14)", "isVoice": true,
@@ -228,37 +256,9 @@
         "options": [{ "t": "Data is king! 🦾 Wie hat sich der Customer Lifetime Value entwickelt?", "r": "Über 25% gestiegen dank unserer Fokussierung 2026! 📈 Unsere Rider spüren die Leidenschaft. Echte Loyalität!" }]
       },
       {
-        "id": 5, "name": "LeBron James", "initial": "LJ", "color": "#f59e0b", "sub": "LBJ Legacy Bike",
-        "initialMessages": ["Yo Roman! 🏀 R126 has gone live! The campaign is on point in the US, sales is skyrocketing!"],
-        "options": [{ "t": "King James! 👑 Fantastic! Our approach to understand our riders even better takes off! I'm proud.", "r": "Me too, Roman. Wanna join me on a ride in LA together with Mark Allen?" }]
-      },
-      {
-        "id": 6, "name": "Rad Race", "initial": "RR", "color": "#10b981", "sub": "Best Canyon Service",
-        "initialMessages": [
-          "Hey Roman, mega, was ihr mit dem Neustart der Service Plattform erreicht habt!",
-          "Es macht richtig Spaß mit euch zu arbeiten, weil wir immer top informiert sind über Rider und Bikes."
-        ],
-        "options": [{ "t": "Super, freut mich, dass ihr mit Canyon wachsen könnt. Ihr seid für uns ein wichtiger Erfolgsfaktor!", "r": "'Pure Cycling' bis in die letzte Schraube. Gerne zeige ich dir unsere neue Werkstatt in München." }]
-      },
-      {
-        "id": 7, "name": "Sarah", "initial": "S", "color": "#8b5cf6", "sub": "Community Managerin",
-        "initialMessages": ["Roman! NPS auf Rekordhoch. 📈", "KI löst Standard-Themen und wir haben Zeit für echte Geschichten.", "Feedback bleibt unser wichtigster Input!"],
-        "options": [{ "t": "Genau, also wie immer: Schick mir Montag die kritischen Stimmen.", "r": "Keine Sorge, die Montags-Runde bleibt heilig. 😉" }]
-      },
-      {
         "id": 8, "name": "Shanghai Store", "initial": "SH", "color": "#3b82f6", "sub": "Skalierung Asien",
         "initialMessages": ["Grüße aus Shanghai! 🇨🇳 MyCanyon ist der Wahnsinn.", "Das Custom-Rad ist schneller beim Kunden als je zuvor.", "Die neuen Systeme haben unsere Skalierung erst möglich gemacht."],
         "options": [{ "t": "Shanghai ist ein Schlüsselmarkt. Der Backbone war ein wichtiger Hebel.", "r": "Absolut! War die beste Entscheidung der letzten Jahre. Wir sind unschlagbar." }]
-      },
-      {
-        "id": 9, "name": "CFO", "initial": "CF", "color": "#64748b", "sub": "TCO & Margen",
-        "initialMessages": ["Morgen Roman. TCO auf Rekordtief. 📉", "15 Altsysteme weg. Geld fließt direkt in die neue F&E.", "So macht Optimieren Spaß!"],
-        "options": [{ "t": "Weniger Silos = mehr Freiheit für Entwicklung. Enormes Potenzial.", "r": "Ich hab's dir immer gesagt. 📈 Wie immer? Abendrunde Mittwoch 18 Uhr?" }]
-      },
-      {
-        "id": 10, "name": "Stammkunde", "initial": "R", "color": "#94a3b8", "sub": "Neues Aeroad",
-        "initialMessages": ["Hi Roman, mein neues Aeroad kam an. Euer Bike Fitting Service begeistert!", "Stack und Reach passen perfekt. Das ist Perfektion."],
-        "options": [{ "t": "Genau das war der Plan: Ein System, das den Rider perfekt kennt. Danke!", "r": "Beratung wie früher in der Garage – nur digital. 📸" }]
       }
     ];
 
