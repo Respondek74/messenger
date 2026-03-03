@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ekornes / Stressless® — Service Design Blueprint</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0F1117; font-family: 'DM Sans', Helvetica, sans-serif; color: #E0E0E0; overflow-x: auto; }
+  ::-webkit-scrollbar { height: 8px; width: 8px; }
+  ::-webkit-scrollbar-track { background: #1A1C24; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #555; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const { useState, useRef, useEffect, createElement: h } = React;
+
+const COL_W = 220;
+const LABEL_W = 180;
+const GAP = 2;
+
+const colors = ["#8BA4B8","#6B8F71","#C4956A","#A67B5B","#7A8B6F","#5C7080","#8B7D9B"];
+const phaseNames = ["Discover","Explore","Configure","Touch","Experience","Purchase","Belong"];
+const phaseSubtitles = ["First Contact","Interactive House","Heart of Experience","Haptic Bridge","Dealer Visit","Seamless Checkout","Post-Purchase"];
+const phaseIcons = ["\u2726","\u25C8","\u25C9","\u25D0","\u25C6","\u25CF","\u2727"];
+
+const layers = [
+  {
+    id: "evidence",
+    label: "Physical Evidence",
+    desc: "What the customer sees and touches",
+    bg: "#1E2A1E",
+    accent: "#6B8F71",
+    items: [
+      ["Social media ads","Video content","Magazine features"],
+      ["stressless.com","Room visualisations","Comfort Profile UI"],
+      ["3D configurator","WebAR in-room view","Shared config link"],
+      ["Haptic product\n(coasters, key fob,\nbookmark)","Email with config","Material in hand"],
+      ["Dealer locator","Appointment confirm.","Showroom display"],
+      ["Invoice / receipt","Order confirmation","Delivery tracking page"],
+      ["Care guide email","Accessory catalogue","Community portal"]
+    ]
+  },
+  {
+    id: "customer",
+    label: "Customer Actions",
+    desc: "What the customer does at each phase",
+    bg: "#1A1F2E",
+    accent: "#8BA4B8",
+    items: [
+      ["See ad / recommendation","Click through to site"],
+      ["Fill Comfort Profile","Browse rooms","Get recommendations"],
+      ["Configure product","Try WebAR","Share with partner","Save to wishlist"],
+      ["Order haptic product\n(< \u20AC10)","Feel materials","Finalise config"],
+      ["Search dealer","Book appointment","Visit showroom","Probesitzen"],
+      ["Confirm purchase","Choose delivery","Pay"],
+      ["Open care emails","Browse accessories","Join community","Recommend brand"]
+    ]
+  },
+  {
+    id: "line_interaction",
+    label: "",
+    desc: "LINE OF INTERACTION",
+    bg: "none",
+    accent: "#FFB74D",
+    items: null
+  },
+  {
+    id: "frontstage",
+    label: "Frontstage",
+    desc: "Visible touchpoints and interfaces",
+    bg: "#1F1A2E",
+    accent: "#9B8BBF",
+    items: [
+      ["Social media platform","Landing pages","SEO / content pages"],
+      ["Interactive house\nnavigation","Comfort Profile quiz","AI-driven\nrecommendation feed"],
+      ["Real-time 3D\nconfigurator","WebAR (browser)","Shared wishlist\n& compare view"],
+      ["Micro-commerce\ncheckout","Nurturing emails","Config summary\npage"],
+      ["Dealer locator\nwith map","Appointment\nbooking widget","Dealer receives\ncustomer briefing"],
+      ["POS system\nat dealer","Online checkout\n(future D2C)","Order status\nportal"],
+      ["Automated email\nsequences","Personalised\naccessory page","Community /\nreview platform"]
+    ]
+  },
+  {
+    id: "line_visibility",
+    label: "",
+    desc: "LINE OF VISIBILITY",
+    bg: "none",
+    accent: "#FF7043",
+    items: null
+  },
+  {
+    id: "backstage",
+    label: "Backstage",
+    desc: "Internal processes the customer doesn\u2019t see",
+    bg: "#2A1F1F",
+    accent: "#C4956A",
+    items: [
+      ["Content creation\n& scheduling","Campaign\nmanagement","SEO optimisation"],
+      ["Editorial content\nmanagement","Profile data\ncapture & storage","AI model\ntraining & tuning"],
+      ["Product data\nsynchronisation","3D asset\nmanagement","Config data\npersistence"],
+      ["Order routing\nto fulfilment","Lead scoring\n& qualification","Automated email\ntriggers"],
+      ["Customer profile\nhandover to dealer","Appointment\nnotifications","Dealer briefing\ngeneration"],
+      ["Order processing","Regional price\ncalculation","Inventory &\ndelivery planning"],
+      ["Lifecycle email\nautomation","Cross-sell\nalgorithms","Review\nmoderation"]
+    ]
+  },
+  {
+    id: "line_internal",
+    label: "",
+    desc: "LINE OF INTERNAL INTERACTION",
+    bg: "none",
+    accent: "#78909C",
+    items: null
+  },
+  {
+    id: "support",
+    label: "Support Systems",
+    desc: "Technology and infrastructure",
+    bg: "#1A1A1A",
+    accent: "#78909C",
+    items: [
+      ["CMS","Social media APIs","Google Analytics\n/ Adobe Analytics"],
+      ["Headless CMS\n(Storyblok)","Customer Data\nPlatform (CDP)","AI / ML\npersonalisation"],
+      ["3D engine\n(Cylindo/Threekit)","WebAR SDK","Master Data Hub","PIM"],
+      ["Micro-commerce\nmodule","Marketing Auto.\n(Marketo)","CRM","Logistics / ERP"],
+      ["CRM","Dealer Portal","Booking system","Dealer Enablement\nDashboard"],
+      ["Commerce\nPlatform","ERP / SAP","Order Mgmt\nSystem","Automated\nPrice Engine"],
+      ["Marketo","CRM","Community\nplatform","AI recommendation\nengine"]
+    ]
+  }
+];
+
+const actors = [
+  {
+    label: "Actors",
+    bg: "#1C1C22",
+    accent: "#E0E0E0",
+    items: [
+      ["Customer"],
+      ["Customer"],
+      ["Customer","Partner"],
+      ["Customer","Fulfilment team"],
+      ["Customer","Dealer","Sales staff"],
+      ["Customer","Dealer","Finance"],
+      ["Customer","Marketing","Community mgr"]
+    ]
+  }
+];
+
+function Cell(props) {
+  var items = props.items;
+  var color = props.color;
+  var isHighlighted = props.isHighlighted;
+  return h('div', {
+    style: {
+      width: COL_W + 'px',
+      minWidth: COL_W + 'px',
+      padding: '12px 14px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '6px',
+      opacity: isHighlighted ? 1 : 0.45,
+      transition: 'opacity 0.3s ease',
+      borderRight: '1px solid rgba(255,255,255,0.04)'
+    }
+  },
+    items.map(function(item, j) {
+      return h('div', {
+        key: j,
+        style: {
+          fontSize: '11px',
+          lineHeight: 1.4,
+          padding: '6px 10px',
+          background: color + '15',
+          border: '1px solid ' + color + '25',
+          borderRadius: '6px',
+          color: '#CCC',
+          whiteSpace: 'pre-line'
+        }
+      }, item);
+    })
+  );
+}
+
+function LineSeparator(props) {
+  return h('div', {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      minHeight: '32px',
+      position: 'relative'
+    }
+  },
+    h('div', {
+      style: {
+        width: LABEL_W + 'px',
+        minWidth: LABEL_W + 'px',
+        paddingRight: '16px',
+        textAlign: 'right'
+      }
+    }),
+    h('div', {
+      style: {
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '0 16px'
+      }
+    },
+      h('div', {
+        style: {
+          flex: 1,
+          height: '2px',
+          background: 'repeating-linear-gradient(90deg, ' + props.color + ' 0, ' + props.color + ' 8px, transparent 8px, transparent 16px)',
+          opacity: 0.6
+        }
+      }),
+      h('span', {
+        style: {
+          fontFamily: "'DM Mono', monospace",
+          fontSize: '9px',
+          letterSpacing: '2px',
+          textTransform: 'uppercase',
+          color: props.color,
+          whiteSpace: 'nowrap',
+          opacity: 0.8
+        }
+      }, props.label),
+      h('div', {
+        style: {
+          flex: 1,
+          height: '2px',
+          background: 'repeating-linear-gradient(90deg, ' + props.color + ' 0, ' + props.color + ' 8px, transparent 8px, transparent 16px)',
+          opacity: 0.6
+        }
+      })
+    )
+  );
+}
+
+var STRESSLESS_LOGO = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI4LjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAxNTAwIDE1MDAiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDE1MDAgMTUwMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtmaWxsOnVybCgjU1ZHSURfMV8pO30KCS5zdDF7ZmlsbDojRkZGRkZGO30KPC9zdHlsZT4KPGc+Cgk8Zz4KCQkKCQkJPHJhZGlhbEdyYWRpZW50IGlkPSJTVkdJRF8xXyIgY3g9IjQ0OS40MzUzIiBjeT0iLTE2OS4xMDY0IiByPSI3MjIuMDU2OSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgxLjA3NDkgMCAwIDAuNzkyOSAzMTAuODM1IDcxNy4yODc4KSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgoJCQk8c3RvcCAgb2Zmc2V0PSIwLjEyODYiIHN0eWxlPSJzdG9wLWNvbG9yOiMxMjU3OUQiLz4KCQkJPHN0b3AgIG9mZnNldD0iMC4yOTg1IiBzdHlsZT0ic3RvcC1jb2xvcjojMEMzRDdBIi8+CgkJCTxzdG9wICBvZmZzZXQ9IjAuNDkyIiBzdHlsZT0ic3RvcC1jb2xvcjojMDcyNTVBIi8+CgkJCTxzdG9wICBvZmZzZXQ9IjAuNjc4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDMxMzQyIi8+CgkJCTxzdG9wICBvZmZzZXQ9IjAuODUxNSIgc3R5bGU9InN0b3AtY29sb3I6IzAxMDkzNCIvPgoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDAwNTJGIi8+CgkJPC9yYWRpYWxHcmFkaWVudD4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTM0OC4zLDY4OS41YzAsMTU0LjQtMzcxLjQsMzg4LjctNzAyLjgsMzg4LjdjLTI0OC41LDAtNDk3LjItMzAwLjgtNDk3LjItNTAyCgkJCWMwLTE4MS40LDMxMS44LTE3MS45LDU2Mi45LTEzOC40QzkwMy45LDQ2My42LDEzNDguMyw1NTMuOCwxMzQ4LjMsNjg5LjV6Ii8+Cgk8L2c+Cgk8Zz4KCQk8Zz4KCQkJPGc+CgkJCQk8Zz4KCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNOTQxLjYsNTg2LjhDOTI4LjUsNjUxLDkxMi40LDczNCw5MDEuMyw3OTUuM2MtMS40LDcuNSw1LDE0LjYsMTIuNiwxNC44YzAsMCwwLjEsMCwwLjEsMAoJCQkJCQljMTIuMi02NS43LDI5LjUtMTUzLjcsNDMuOC0yMjIuMkM5NTIuNyw1ODcuMyw5NDYuOCw1ODYuOSw5NDEuNiw1ODYuOCIvPgoJCQkJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik05NTcuNCw2MzJjMC0xLjgsMC4yLTMuNiwwLjYtNS4zYzAuNC0xLjcsMS4xLTMuMywxLjktNC44YzAuOC0xLjUsMS44LTIuOCwzLTRjMS4yLTEuMiwyLjUtMi4zLDMuOS0zLjIKCQkJCQkJYzEuNC0wLjksMy0xLjYsNC43LTIuMWMxLjctMC41LDMuNC0wLjgsNS4yLTAuOGMxLjgsMCwzLjYsMC4yLDUuMywwLjZjMS43LDAuNCwzLjMsMS4xLDQuNywxLjljMS41LDAuOCwyLjgsMS44LDQsMwoJCQkJCQljMS4yLDEuMiwyLjMsMi41LDMuMiwzLjljMC45LDEuNSwxLjYsMywyLjEsNC43YzAuNSwxLjcsMC44LDMuNCwwLjgsNS4yYzAsMS44LTAuMiwzLjUtMC42LDUuMmMtMC40LDEuNy0xLjEsMy4zLTEuOSw0LjcKCQkJCQkJYy0wLjgsMS41LTEuOCwyLjgtMyw0Yy0xLjIsMS4yLTIuNSwyLjMtMy45LDMuMmMtMS40LDAuOS0zLDEuNi00LjcsMi4xYy0xLjcsMC41LTMuNCwwLjgtNS4yLDAuOGMtMS44LDAtMy42LTAuMi01LjItMC42CgkJCQkJCWMtMS43LTAuNC0zLjMtMS4xLTQuNy0xLjljLTEuNS0wLjgtMi44LTEuOC00LTNjLTEuMi0xLjItMi4zLTIuNS0zLjItMy45Yy0wLjktMS40LTEuNi0zLTIuMS00LjcKCQkJCQkJQzk1Ny43LDYzNS41LDk1Ny41LDYzMy44LDk1Ny40LDYzMiBNOTYwLjEsNjMxLjljMCwxLjYsMC4yLDMuMSwwLjcsNC42YzAuNCwxLjUsMSwyLjgsMS44LDQuMWMwLjgsMS4zLDEuNywyLjQsMi43LDMuNAoJCQkJCQljMSwxLDIuMiwxLjksMy41LDIuNmMxLjMsMC43LDIuNiwxLjMsNC4xLDEuN2MxLjUsMC40LDMsMC42LDQuNiwwLjVjMi40LDAsNC42LTAuNSw2LjctMS41YzIuMS0wLjksMy44LTIuMiw1LjQtMy44CgkJCQkJCWMxLjUtMS42LDIuNy0zLjQsMy42LTUuNWMwLjktMi4xLDEuMy00LjQsMS4yLTYuOGMwLTEuNi0wLjMtMy4xLTAuNy00LjZjLTAuNC0xLjUtMS0yLjktMS44LTQuMWMtMC44LTEuMy0xLjctMi40LTIuNy0zLjUKCQkJCQkJYy0xLTEtMi4yLTEuOS0zLjUtMi43Yy0xLjMtMC43LTIuNi0xLjMtNC4xLTEuN2MtMS41LTAuNC0zLTAuNi00LjYtMC41Yy0yLjQsMC00LjYsMC41LTYuNiwxLjVjLTIuMSwwLjktMy44LDIuMi01LjMsMy44CgkJCQkJCWMtMS41LDEuNi0yLjcsMy41LTMuNSw1LjZDOTYwLjUsNjI3LjIsOTYwLjEsNjI5LjUsOTYwLjEsNjMxLjkgTTk3My42LDYzNGwwLjEsOWwtMy45LDAuMWwtMC40LTIyLjZsNy4zLTAuMQoJCQkJCQljMi45LDAsNS4xLDAuNCw2LjUsMS41YzEuNCwxLDIuMSwyLjYsMi4yLDQuNmMwLDEuNi0wLjQsMi45LTEuMyw0LjFjLTAuOSwxLjEtMi4yLDEuOS00LDIuNGMwLjMsMC4yLDAuNSwwLjQsMC44LDAuNgoJCQkJCQljMC4yLDAuMywwLjQsMC41LDAuNiwwLjlsNS45LDguNGwtMy43LDAuMWMtMC42LDAtMS0wLjItMS4zLTAuNmwtNS4yLTcuNmMtMC4yLTAuMi0wLjMtMC40LTAuNi0wLjVjLTAuMi0wLjEtMC41LTAuMi0xLTAuMgoJCQkJCQlMOTczLjYsNjM0eiBNOTczLjUsNjMxLjFsMi45LDBjMC45LDAsMS43LTAuMSwyLjQtMC4zYzAuNi0wLjIsMS4yLTAuNSwxLjYtMC44YzAuNC0wLjMsMC43LTAuOCwwLjgtMS4zCgkJCQkJCWMwLjItMC41LDAuMi0xLjEsMC4yLTEuN2MwLTAuNi0wLjEtMS4yLTAuMy0xLjZjLTAuMi0wLjUtMC40LTAuOS0wLjgtMS4yYy0wLjQtMC4zLTAuOS0wLjUtMS40LTAuN2MtMC42LTAuMS0xLjMtMC4yLTIuMi0wLjIKCQkJCQkJbC0zLjMsMC4xTDk3My41LDYzMS4xeiIvPgoJCQkJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik03OTQuMyw3MTIuNGMtNS43LTYuNS0xMS44LTEyLjctMTcuMi0xOS4zYy03LjYtOS40LTguMS0xOS44LTEuOS0yNi44YzEwLjEtMTAuOCwyOS04LjUsMzkuOS0zLjRsMC4xLDAKCQkJCQkJYzMuNiwxLjcsNy44LDAuNCw5LjUtM2MxLTIsMS45LTMuOCwzLTUuOWMwLDAtMS41LTEtMi4yLTEuNWMtMTUuOC0xMC42LTQ1LjMtMTMuNC02MS4yLDAuM2MtMTEuOSwxMC0xMy41LDI4LjQtMy4zLDQzLjUKCQkJCQkJYzQuMyw2LjQsMTAuMSwxMi4xLDE1LjIsMTguMWMzLjcsNC40LDcuOCw4LjUsMTEsMTMuMWM3LjksMTEuNSw2LjYsMjIuNy0yLjgsMzAuNGMtOC4xLDYuNi0xNy44LDcuNS0yOC44LDMKCQkJCQkJYy00LjEtMS43LTcuOS00LTEyLjEtNi4yYy0yLDQtNCw4LTYuMiwxMi4zYzEyLjUsMTAuNCwyOS43LDE0LjYsNDQuMSwxMC44YzE4LjEtNC43LDI5LjItMjAuNCwyNi43LTM4LjQKCQkJCQkJQzgwNi44LDcyOS40LDgwMS41LDcyMC42LDc5NC4zLDcxMi40Ii8+CgkJCQkJPHBhdGggY2xhc3M9InN0MSIgZD0iTTg1OS40LDY5NC45Yy03LTkuNi02LjgtMjAtMC4yLTI2LjljMTAuOC0xMC42LDI5LjUtNy43LDQwLjEtMi4zYzAsMCwwLDAsMC4xLDBjMy41LDEuOCw3LjgsMC42LDkuNy0yLjcKCQkJCQkJYzEuMS0xLjksMi4yLTMuNywzLjQtNS44YzAsMC0xLjUtMS4xLTIuMS0xLjZjLTE1LjItMTEtNDQuNS0xNC42LTYxLjItMS40Yy0xMi41LDkuNi0xNS4zLDI4LTYuMSw0My40CgkJCQkJCWMzLjksNi41LDkuMywxMi40LDE0LjEsMTguNWMzLjQsNC41LDcuMyw4LjcsMTAuMiwxMy40YzcuMSwxMS43LDUuMSwyMi45LTQuNywzMC4zYy04LjUsNi40LTE4LjIsNy0yOSwyLjIKCQkJCQkJYy00LTEuOC03LjYtNC4yLTExLjctNi41Yy0yLjMsMy45LTQuNSw3LjktNi45LDEyLjFjMTEuOCwxMC43LDI4LjgsMTUuNCw0My40LDEyYzE4LjQtNC4yLDMwLjUtMTkuNiwyOS4yLTM3LjYKCQkJCQkJYy0wLjgtMTAuMi01LjUtMTkuMS0xMi4yLTI3LjVDODcwLjEsNzA4LjEsODY0LjMsNzAxLjcsODU5LjQsNjk0LjkiLz4KCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNNzAzLjksNjQ0LjNjLTE2LjMsMC40LTI5LjEsOC0zOS41LDE4Yy0yMC4xLDE5LjMtMzQuNiw1Ni0yMy45LDkxLjFjNi41LDIxLjQsMjMuNiwzMS40LDQ1LjEsMjcuNgoJCQkJCQljMTEuMS0xLjksMjAuMy03LjIsMjguNi0xNC4xYzkuMy03LjcsMTYuNi0xNi45LDIyLTI3LjljLTEuOS0xLjEtMy44LTIuMy01LjctMy40Yy0zLjktMi4zLTktMS4yLTExLjYsMi41CgkJCQkJCWMtMi4zLDMuNC00LjcsNi42LTcuMiw5LjdjLTYuOSw4LjYtMTUuNSwxNS0yNywxNy43Yy01LjEsMS4yLTkuOCwxLjItMTMuOSwwLjFjLTMuNC0xLjItMTktOC41LTE3LjMtMzguOQoJCQkJCQljMTIuMS0yLjgsNjIuMy0xMC44LDc2LjItNDEuOGMwLjEtMC4xLDAuMS0wLjIsMC4yLTAuNGMxLjMtMi41LDIuMy01LjEsMy04LjFDNzM3LDY1OC41LDcyNCw2NDMuOCw3MDMuOSw2NDQuMyBNNzExLjYsNjg0LjkKCQkJCQkJYy0xNSwyMC40LTU2LjQsMjYuMi01Ni40LDI2LjNjLTAuMSwwLDEzLTUxLjIsNDkuMi01MS43YzMuNS0wLjEsNywwLjksOS42LDMuMkM3MTcuOCw2NjYsNzIwLjYsNjcyLjYsNzExLjYsNjg0LjkiLz4KCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTEwNi4yLDcyNi4zYy01LjItNi45LTEwLjgtMTMuNS0xNS42LTIwLjZjLTYuOC0xMC02LjUtMjAuNCwwLjItMjYuOWMxMC45LTEwLDI5LjYtNi4yLDQwLTAuM2wwLjEsMAoJCQkJCQljMy41LDIsNy43LDEsOS43LTIuMmMxLjEtMS45LDIuMi0zLjcsMy41LTUuN2MwLDAtMS41LTEuMS0yLjEtMS42Yy0xNS0xMS44LTQ0LjEtMTYuOS02MS00LjVjLTEyLjYsOS0xNS42LDI3LjMtNi43LDQzLjEKCQkJCQkJYzMuOCw2LjcsOS4xLDEyLjksMTMuNywxOS4zYzMuMyw0LjYsNy4yLDkuMSwxMCwxMy45YzYuOSwxMi4xLDQuOCwyMy4yLTUuMSwzMC4xYy04LjYsNi0xOC4zLDYuMS0yOC45LDAuOAoJCQkJCQljLTMuOS0yLTcuNi00LjYtMTEuNi03LjFjLTIuMywzLjgtNC43LDcuNy03LjEsMTEuOGMxMS42LDExLjMsMjguNSwxNi44LDQzLjEsMTQuMmMxOC40LTMuMywzMC43LTE4LjEsMjkuNy0zNi4yCgkJCQkJCUMxMTE3LjMsNzQ0LjMsMTExMi43LDczNS4xLDExMDYuMiw3MjYuMyIvPgoJCQkJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xMTgyLjMsNzQwLjljNS43LDEwLjQsOS40LDIwLDkuNCwzMS44YzAsMTcuMi0xNS4xLDM1LjMtMzMuOSwzNy44Yy0xNC44LDItMzAuNy0yLjgtNDEuMi0xNi41CgkJCQkJCWMwLDAsNC40LTUsNy42LTExLjJjMCwwLDQsMy45LDExLjEsOC4xYzEwLjQsNi4zLDIwLjMsNy41LDI5LjUsMS4yYzEwLjYtNy4yLDEzLjYtMjAuOSw3LjgtMzUuMWMtMi4zLTUuNy01LjctMTEuMS04LjYtMTYuNgoJCQkJCQljLTQtNy42LTkuMS0xNS0xMi40LTIyLjljLTguOS0yMS4zLTItMzcuOCwxMS40LTQ3LjNjMTgtMTMuMSw0OC4xLTYuOSw2Mi43LDlsLTQuNSw1LjJjLTIuNCwyLjgtNy4xLDMuOC0xMC4xLDEuNgoJCQkJCQljLTkuNi03LTI2LjctMTEuNy0zOS42LDAuMWMtNy41LDYuOC04LjgsMTguNC0yLjksMzAuMkMxMTcyLjgsNzI0LjgsMTE3Ny44LDczMi43LDExODIuMyw3NDAuOSIvPgoJCQkJCTxnPgoJCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzY5LjYsODIzLjNjLTI4LjUtMS4xLTUzLjgtMTIuOC03Mi4xLTM0LjFsMTEuNi0xMGMyOC45LDMzLjUsNjgsMzAuNyw4OC43LDI2LjEKCQkJCQkJCWMzMy45LTcuNiw2NS4yLTMwLjQsNzEuMy01Mi4xYzIuOC0xMCwyLjMtMTcuMy0xLjUtMjIuM2MtMTEuNC0xNS01NS40LTE0LjItOTQuMi0xNC4yYy01MC4yLDAuMS02My40LTIyLjMtNjYuNC0zNS4yCgkJCQkJCQljLTUuNy0yNC44LDE0LjktNTQuNCw0Ny45LTcwLjRjNjIuOC0zMC40LDEyOC41LTE0LjksMTMxLjMtMTQuM2wtMS42LDYuNWMtMS4xLDQuNy01LjcsOC40LTEwLjQsNy43CgkJCQkJCQljLTE5LTIuOS02Ny4zLTcuMy0xMTIuNiwxNC43Yy0yNS44LDEyLjUtNDIuOSwzNS4xLTM4LjksNTIuNGMzLjMsMTQuNCwyMS44LDIyLjYsNTAuNywyMi41YzU0LjYtMC4xLDkyLjIsMS40LDEwNy4xLDIxCgkJCQkJCQljNi44LDksOC4yLDIxLDQuMSwzNS43Yy03LjcsMjcuNS00My4yLDU0LTgzLjUsNjIuOUMzOTAuNCw4MjIuNywzNzkuOCw4MjMuNywzNjkuNiw4MjMuM3oiLz4KCQkJCQk8L2c+CgkJCQkJPHBhdGggY2xhc3M9InN0MSIgZD0iTTEwMjQuMSw2NTAuMWMtMTYuMy0xLjItMjkuOCw1LjItNDEuMSwxNC4yYy0yMS45LDE3LjMtMzkuOCw1Mi40LTMyLjUsODguNGM0LjUsMjEuOSwyMC41LDMzLjUsNDIuMiwzMS44CgkJCQkJCWMxMS4zLTAuOSwyMC45LTUuMiwyOS44LTExLjNjMTAtNi44LDE4LjEtMTUuMywyNC42LTI1LjdjLTEuOC0xLjMtMy42LTIuNi01LjMtMy45Yy0zLjctMi43LTguOC0yLjEtMTEuOCwxLjQKCQkJCQkJYy0yLjcsMy4xLTUuMyw2LjItOC4xLDljLTcuNyw3LjktMTYuOSwxMy41LTI4LjUsMTUuMWMtNS4yLDAuNy05LjksMC4zLTEzLjgtMS4yYy0zLjMtMS42LTE4LjEtMTAuMi0xMy41LTQwLjQKCQkJCQkJYzEyLjMtMS42LDYzLTQuOCw3OS44LTM0LjRjMC4xLTAuMSwwLjEtMC4yLDAuMi0wLjNjMS41LTIuMywyLjgtNC45LDMuNy03LjdDMTA1NS42LDY2Ny40LDEwNDQuMSw2NTEuNiwxMDI0LjEsNjUwLjEKCQkJCQkJIE0xMDI3LjgsNjkxLjNjLTE2LjksMTguOC01OC43LDIwLjctNTguNywyMC44Yy0wLjEsMCwxNy44LTQ5LjcsNTMuOS00Ni44YzMuNSwwLjMsNi45LDEuNiw5LjIsNC4xCgkJCQkJCUMxMDM1LjcsNjczLDEwMzgsNjc5LjksMTAyNy44LDY5MS4zIi8+CgkJCQk8L2c+CgkJCQk8Zz4KCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNNjQ3LDY1OS4zTDY0Nyw2NTkuM2wyLjQtMTEuN2MtMzcuMy0zLjYtNTcuNiwyMi44LTY1LjIsMzkuOGMwLjYtNi43LDEtMTMuNSwxLjctMjAuMwoJCQkJCQljMC44LTcuOS0zLjktMTEuMi05LjgtMTAuOWMwLDAtMzQuMSwyLjItNDUuOSwzLjJsMCwwYzEuOC0yNS45LDMuNy01MS4yLDUuNS03NC4zYy01LjIsMC4xLTExLjEsMC40LTE2LjMsMC45CgkJCQkJCWMtMS43LDIzLjItMy40LDQ4LjgtNS4xLDc0LjljLTI0LjYsMi40LTcxLjIsNy43LTcxLjIsNy43YzEuMSw5LjUsMi42LDEzLjgsMTMuNywxMi42YzE4LjgtMi4xLDM3LjctNC4zLDU2LjUtNi4xCgkJCQkJCWMtMi44LDQzLjEtNS4zLDg2LjgtNy4yLDEyMi45Yy0wLjQsNy42LDYuOCwxMy45LDE0LjQsMTMuMWMwLDAsMC4xLDAsMC4xLDBjMi4yLTQwLjYsNS4zLTg5LjYsOC42LTEzNy41CgkJCQkJCWM4LjgtMC44LDE2LjYtMiwzNS43LTMuMmMyLjUtMC4yLDUsMC4yLDQuOCwyLjdjLTIuOCwzNC45LTcuOCw4NC05LjcsMTE0LjNjMCwwLDcuOS0xLjIsMTUuMS0xLjRsNC42LTQ5LjUKCQkJCQkJYzEuMS0xMS4zLDMuNi0yMi41LDguMi0zMi44YzE0LjctMzMuMyw0MC43LTM5LDUyLjEtMzguOWwwLDBDNjQwLDY2NC43LDY0NS45LDY2NC44LDY0Nyw2NTkuM3oiLz4KCQkJCTwvZz4KCQkJPC9nPgoJCTwvZz4KCTwvZz4KPC9nPgo8L3N2Zz4K';
+
+function App() {
+  var ref = useState(-1);
+  var hoverCol = ref[0];
+  var setHoverCol = ref[1];
+  var scrollRef = useRef(null);
+
+  var totalW = LABEL_W + (COL_W + GAP) * 7 + 40;
+
+  function renderRow(layer, rowIndex) {
+    if (layer.items === null) {
+      return h(LineSeparator, { key: layer.id, color: layer.accent, label: layer.desc });
+    }
+    return h('div', {
+      key: layer.id,
+      style: {
+        display: 'flex',
+        alignItems: 'stretch',
+        background: layer.bg,
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        minWidth: totalW + 'px'
+      }
+    },
+      // Label
+      h('div', {
+        style: {
+          width: LABEL_W + 'px',
+          minWidth: LABEL_W + 'px',
+          padding: '16px 16px 16px 24px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          borderRight: '1px solid rgba(255,255,255,0.06)',
+          position: 'sticky',
+          left: 0,
+          background: layer.bg === 'none' ? '#0F1117' : layer.bg,
+          zIndex: 2
+        }
+      },
+        h('div', {
+          style: {
+            fontSize: '12px',
+            fontWeight: 600,
+            color: layer.accent,
+            letterSpacing: '0.5px',
+            marginBottom: '2px'
+          }
+        }, layer.label),
+        h('div', {
+          style: {
+            fontSize: '9px',
+            color: '#666',
+            letterSpacing: '0.3px'
+          }
+        }, layer.desc)
+      ),
+      // Cells
+      layer.items.map(function(cellItems, colIdx) {
+        return h('div', {
+          key: colIdx,
+          onMouseEnter: function() { setHoverCol(colIdx); },
+          onMouseLeave: function() { setHoverCol(-1); },
+          style: { display: 'flex' }
+        },
+          h(Cell, {
+            items: cellItems,
+            color: colors[colIdx],
+            isHighlighted: hoverCol === -1 || hoverCol === colIdx
+          })
+        );
+      })
+    );
+  }
+
+  function renderActors() {
+    var a = actors[0];
+    return h('div', {
+      key: 'actors',
+      style: {
+        display: 'flex',
+        alignItems: 'stretch',
+        background: a.bg,
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        minWidth: totalW + 'px'
+      }
+    },
+      h('div', {
+        style: {
+          width: LABEL_W + 'px',
+          minWidth: LABEL_W + 'px',
+          padding: '16px 16px 16px 24px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          borderRight: '1px solid rgba(255,255,255,0.06)',
+          position: 'sticky',
+          left: 0,
+          background: a.bg,
+          zIndex: 2
+        }
+      },
+        h('div', { style: { fontSize: '12px', fontWeight: 600, color: '#E0E0E0', letterSpacing: '0.5px', marginBottom: '2px' } }, a.label),
+        h('div', { style: { fontSize: '9px', color: '#666' } }, 'People involved')
+      ),
+      a.items.map(function(cellItems, colIdx) {
+        return h('div', {
+          key: colIdx,
+          onMouseEnter: function() { setHoverCol(colIdx); },
+          onMouseLeave: function() { setHoverCol(-1); },
+          style: {
+            width: COL_W + 'px',
+            minWidth: COL_W + 'px',
+            padding: '12px 14px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            opacity: hoverCol === -1 || hoverCol === colIdx ? 1 : 0.45,
+            transition: 'opacity 0.3s ease',
+            borderRight: '1px solid rgba(255,255,255,0.04)'
+          }
+        },
+          cellItems.map(function(actor, j) {
+            return h('div', {
+              key: j,
+              style: {
+                fontSize: '10px',
+                padding: '4px 10px',
+                background: 'rgba(255,255,255,0.06)',
+                borderRadius: '12px',
+                color: '#BBB',
+                textAlign: 'center',
+                border: '1px solid rgba(255,255,255,0.08)'
+              }
+            }, actor);
+          })
+        );
+      })
+    );
+  }
+
+  return h('div', { style: { minHeight: '100vh', overflow: 'hidden' } },
+
+    // Header (fixed, does not scroll horizontally)
+    h('div', {
+      style: {
+        padding: '36px 24px 28px',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        background: '#0F1117',
+        zIndex: 10
+      }
+    },
+      h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' } },
+        h('div', null,
+          h('div', { style: { fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', color: '#555', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' } },
+            h('a', { href: 'Ekornes_UX_Discovery_Index.html', style: { fontSize: '10px', color: '#555', textDecoration: 'none', letterSpacing: '0', textTransform: 'none', transition: 'color 0.2s' }, onMouseEnter: function(e){e.target.style.color='#999'}, onMouseLeave: function(e){e.target.style.color='#555'} }, '\u2190 Overview'),
+            h('span', { style: { color: '#333' } }, '|'),
+            h('span', null, 'Ekornes / Stressless\u00AE \u2014 Service Design Blueprint')
+          ),
+          h('h1', { style: { fontSize: '26px', fontWeight: 300, color: '#F0F0F0', marginBottom: '6px' } }, 'Service Design Blueprint'),
+          h('p', { style: { fontSize: '12px', color: '#666', maxWidth: '700px', lineHeight: 1.6 } },
+            'All touchpoints, actors, and systems mapped across seven journey phases. Hover over a column to isolate a phase. Scroll horizontally to explore the full blueprint.'
+          )
+        ),
+        h('img', { src: STRESSLESS_LOGO, alt: 'Stressless', style: { height: '48px', marginTop: '2px', opacity: 0.7, filter: 'brightness(2.5)' } })
+      )
+    ),
+
+    // Scrollable content area
+    h('div', { style: { overflowX: 'auto', overflowY: 'visible' } },
+
+    // Phase Header Row
+    h('div', {
+      style: {
+        display: 'flex',
+        alignItems: 'stretch',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        minWidth: totalW + 'px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 5,
+        background: '#0F1117'
+      }
+    },
+      h('div', {
+        style: {
+          width: LABEL_W + 'px',
+          minWidth: LABEL_W + 'px',
+          padding: '16px 16px 16px 24px',
+          borderRight: '1px solid rgba(255,255,255,0.06)',
+          position: 'sticky',
+          left: 0,
+          background: '#0F1117',
+          zIndex: 6,
+          display: 'flex',
+          alignItems: 'center'
+        }
+      },
+        h('span', { style: { fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '2px', textTransform: 'uppercase', color: '#555' } }, 'Layers \u2193  /  Phases \u2192')
+      ),
+      phaseNames.map(function(name, i) {
+        return h('div', {
+          key: i,
+          onMouseEnter: function() { setHoverCol(i); },
+          onMouseLeave: function() { setHoverCol(-1); },
+          style: {
+            width: COL_W + 'px',
+            minWidth: COL_W + 'px',
+            padding: '14px 14px',
+            textAlign: 'center',
+            borderRight: '1px solid rgba(255,255,255,0.04)',
+            borderBottom: '3px solid ' + (hoverCol === i ? colors[i] : 'transparent'),
+            transition: 'border-color 0.3s, opacity 0.3s',
+            opacity: hoverCol === -1 || hoverCol === i ? 1 : 0.4,
+            cursor: 'default'
+          }
+        },
+          h('div', { style: { fontSize: '20px', marginBottom: '4px', color: colors[i] } }, phaseIcons[i]),
+          h('div', { style: { fontSize: '12px', fontWeight: 600, color: colors[i], letterSpacing: '1px', textTransform: 'uppercase' } }, name),
+          h('div', { style: { fontSize: '9px', color: '#666', marginTop: '2px' } }, phaseSubtitles[i])
+        );
+      })
+    ),
+
+    // Actors row
+    renderActors(),
+
+    // All layers
+    layers.map(function(layer, idx) {
+      return renderRow(layer, idx);
+    }),
+
+    ), // end scrollable content area
+
+    // Footer
+    h('div', {
+      style: {
+        padding: '20px 24px',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        background: '#0F1117'
+      }
+    },
+      h('div', { style: { fontSize: '10px', color: '#444', letterSpacing: '1px' } }, 'SYBIT GMBH \u2014 DIVISION CREATION \u2014 EKORNES CONCEPT 2026'),
+      h('div', { style: { display: 'flex', gap: '16px', alignItems: 'center' } },
+        h('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } },
+          h('div', { style: { width: '20px', height: '2px', background: 'repeating-linear-gradient(90deg, #FFB74D 0, #FFB74D 4px, transparent 4px, transparent 8px)' } }),
+          h('span', { style: { fontSize: '9px', color: '#666' } }, 'Line of Interaction')
+        ),
+        h('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } },
+          h('div', { style: { width: '20px', height: '2px', background: 'repeating-linear-gradient(90deg, #FF7043 0, #FF7043 4px, transparent 4px, transparent 8px)' } }),
+          h('span', { style: { fontSize: '9px', color: '#666' } }, 'Line of Visibility')
+        ),
+        h('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } },
+          h('div', { style: { width: '20px', height: '2px', background: 'repeating-linear-gradient(90deg, #78909C 0, #78909C 4px, transparent 4px, transparent 8px)' } }),
+          h('span', { style: { fontSize: '9px', color: '#666' } }, 'Line of Internal Interaction')
+        )
+      )
+    )
+  );
+}
+
+ReactDOM.render(React.createElement(App), document.getElementById('root'));
+</script>
+</body>
+</html>
