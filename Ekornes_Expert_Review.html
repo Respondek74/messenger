@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stressless – Customer Journey Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0d0b;
+    --surface: #161510;
+    --surface2: #1e1c16;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f0e8d5;
+    --pain: #c0392b;
+    --pain-light: #e74c3c;
+    --pain-bg: rgba(192,57,43,0.12);
+    --opportunity: #2d7a4f;
+    --opportunity-light: #3daa6e;
+    --opportunity-bg: rgba(45,122,79,0.12);
+    --neutral: #8a7f6a;
+    --text: #c8bda8;
+    --text-dim: #6b6254;
+    --border: rgba(201,168,76,0.15);
+    --label-w: 160px;
+    --col-w: 240px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER (non-scrolling) */
+  .header {
+    padding: 48px 40px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    background: linear-gradient(to right, var(--surface), var(--bg));
+  }
+  .brand-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+  .title em { font-style: italic; color: var(--gold-light); }
+
+  /* SCROLLABLE AREA */
+  .scroll-area {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+  .grid-total {
+    min-width: calc(var(--label-w) + var(--col-w) * 5 + 40px);
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    gap: 28px;
+    padding: 16px 40px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .dot-pain { background: var(--pain-light); }
+  .dot-opp { background: var(--opportunity-light); }
+  .dot-neutral { background: var(--gold); }
+
+  /* PHASE HEADER ROW */
+  .phase-row {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .phase-label-cell {
+    width: var(--label-w);
+    min-width: var(--label-w);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--border);
+    position: sticky;
+    left: 0;
+    background: var(--bg);
+    z-index: 6;
+  }
+  .phase-label-cell span {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .phase-cell {
+    width: var(--col-w);
+    min-width: var(--col-w);
+    padding: 16px 20px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.03);
+  }
+  .phase-cell.positive { border-top: 3px solid var(--gold); }
+  .phase-cell.negative { border-top: 3px solid var(--pain-light); }
+  .phase-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .negative .phase-num { color: var(--pain-light); opacity: 0.6; }
+  .phase-name {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .phase-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* EMOTION CURVE ROW */
+  .emotion-row {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .emotion-label {
+    width: var(--label-w);
+    min-width: var(--label-w);
+    padding: 20px 20px;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--border);
+    position: sticky;
+    left: 0;
+    background: var(--surface);
+    z-index: 3;
+  }
+  .emotion-label span {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .emotion-chart {
+    flex: 1;
+    min-width: calc(var(--col-w) * 5);
+    height: 120px;
+    position: relative;
+  }
+  .emotion-chart svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* GENERIC SWIMLANE ROW */
+  .swim-row {
+    display: flex;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .swim-label {
+    width: var(--label-w);
+    min-width: var(--label-w);
+    padding: 20px 20px;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 24px;
+    border-right: 1px solid var(--border);
+    position: sticky;
+    left: 0;
+    z-index: 3;
+  }
+  .swim-label-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+    writing-mode: horizontal-tb;
+  }
+  .swim-cell {
+    width: var(--col-w);
+    min-width: var(--col-w);
+    padding: 16px 14px;
+    border-right: 1px solid rgba(255,255,255,0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* CARD STYLES */
+  .card {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border-left: 2px solid transparent;
+  }
+  .card-type {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .card-text {
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .card.positive {
+    background: rgba(201,168,76,0.08);
+    border-left-color: var(--gold);
+  }
+  .card.positive .card-type { color: var(--gold-light); }
+  .card.pain {
+    background: var(--pain-bg);
+    border-left-color: var(--pain);
+  }
+  .card.pain .card-type { color: var(--pain-light); }
+  .card.pain .card-text { color: #d4a09a; }
+  .card.opportunity {
+    background: var(--opportunity-bg);
+    border-left-color: var(--opportunity-light);
+  }
+  .card.opportunity .card-type { color: var(--opportunity-light); }
+  .card.opportunity .card-text { color: #92c4a8; }
+
+  /* RECOMMENDATIONS SECTION */
+  .rec-section {
+    border-top: 2px solid var(--border);
+    padding: 48px 40px 60px;
+    background: linear-gradient(to bottom, var(--surface), var(--bg));
+    position: sticky;
+    left: 0;
+  }
+  .rec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 36px;
+  }
+  .rec-section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.2;
+  }
+  .rec-section-title em { font-style: italic; color: var(--gold-light); }
+  .rec-tagline {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: right;
+    line-height: 1.7;
+  }
+  .rec-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .rec-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    position: relative;
+  }
+  .rec-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--gold);
+    opacity: 0.2;
+    position: absolute;
+    top: 16px;
+    right: 20px;
+  }
+  .rec-tag {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .rec-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cream);
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+  .rec-body {
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+  .rec-impact {
+    font-size: 10px;
+    color: var(--opportunity-light);
+    letter-spacing: 0.5px;
+  }
+
+  /* FOOTER */
+  .footnote {
+    padding: 20px 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    position: sticky;
+    left: 0;
+    background: var(--bg);
+  }
+
+  /* Row backgrounds */
+  .swim-row:nth-child(odd) .swim-label { background: var(--bg); }
+  .swim-row:nth-child(even) .swim-label { background: var(--surface); }
+  .swim-row:nth-child(even) { background: var(--surface); }
+
+  @media (max-width: 900px) {
+    :root { --col-w: 200px; --label-w: 130px; }
+    .header { padding: 32px 24px 24px; }
+    .title { font-size: 28px; }
+    .rec-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER (does not scroll) -->
+<div class="header">
+  <div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <a href="Ekornes_UX_Discovery_Index.html" style="font-size:10px;color:var(--text-dim);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-dim)'">&larr; Overview</a>
+      <span style="color:var(--text-dim);opacity:0.4;">|</span>
+      <span class="brand-label" style="margin-bottom:0;">Ekornes &middot; Stressless Online Shop</span>
+    </div>
+    <h1 class="title">Customer Journey <em>Map</em><br>Sales Funnel Analysis</h1>
+  </div>
+  <div style="display:flex;align-items:center;gap:32px;">
+    <div style="text-align:right;font-size:12px;color:var(--text-dim);line-height:1.8;">
+      CX Analysis &middot; Sales Funnel<br>
+      Current State + Opportunities<br>
+      March 2026
+    </div>
+    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI4LjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAxNTAwIDE1MDAiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDE1MDAgMTUwMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtmaWxsOnVybCgjU1ZHSURfMV8pO30KCS5zdDF7ZmlsbDojRkZGRkZGO30KPC9zdHlsZT4KPGc+Cgk8Zz4KCQkKCQkJPHJhZGlhbEdyYWRpZW50IGlkPSJTVkdJRF8xXyIgY3g9IjQ0OS40MzUzIiBjeT0iLTE2OS4xMDY0IiByPSI3MjIuMDU2OSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgxLjA3NDkgMCAwIDAuNzkyOSAzMTAuODM1IDcxNy4yODc4KSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgoJCQk8c3RvcCAgb2Zmc2V0PSIwLjEyODYiIHN0eWxlPSJzdG9wLWNvbG9yOiMxMjU3OUQiLz4KCQkJPHN0b3AgIG9mZnNldD0iMC4yOTg1IiBzdHlsZT0ic3RvcC1jb2xvcjojMEMzRDdBIi8+CgkJCTxzdG9wICBvZmZzZXQ9IjAuNDkyIiBzdHlsZT0ic3RvcC1jb2xvcjojMDcyNTVBIi8+CgkJCTxzdG9wICBvZmZzZXQ9IjAuNjc4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDMxMzQyIi8+CgkJCTxzdG9wICBvZmZzZXQ9IjAuODUxNSIgc3R5bGU9InN0b3AtY29sb3I6IzAxMDkzNCIvPgoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDAwNTJGIi8+CgkJPC9yYWRpYWxHcmFkaWVudD4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTM0OC4zLDY4OS41YzAsMTU0LjQtMzcxLjQsMzg4LjctNzAyLjgsMzg4LjdjLTI0OC41LDAtNDk3LjItMzAwLjgtNDk3LjItNTAyCgkJCWMwLTE4MS40LDMxMS44LTE3MS45LDU2Mi45LTEzOC40QzkwMy45LDQ2My42LDEzNDguMyw1NTMuOCwxMzQ4LjMsNjg5LjV6Ii8+Cgk8L2c+Cgk8Zz4KCQk8Zz4KCQkJPGc+CgkJCQk8Zz4KCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNOTQxLjYsNTg2LjhDOTI4LjUsNjUxLDkxMi40LDczNCw5MDEuMyw3OTUuM2MtMS40LDcuNSw1LDE0LjYsMTIuNiwxNC44YzAsMCwwLjEsMCwwLjEsMAoJCQkJCQljMTIuMi02NS43LDI5LjUtMTUzLjcsNDMuOC0yMjIuMkM5NTIuNyw1ODcuMyw5NDYuOCw1ODYuOSw5NDEuNiw1ODYuOCIvPgoJCQkJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik05NTcuNCw2MzJjMC0xLjgsMC4yLTMuNiwwLjYtNS4zYzAuNC0xLjcsMS4xLTMuMywxLjktNC44YzAuOC0xLjUsMS44LTIuOCwzLTRjMS4yLTEuMiwyLjUtMi4zLDMuOS0zLjIKCQkJCQkJYzEuNC0wLjksMy0xLjYsNC43LTIuMWMxLjctMC41LDMuNC0wLjgsNS4yLTAuOGMxLjgsMCwzLjYsMC4yLDUuMywwLjZjMS43LDAuNCwzLjMsMS4xLDQuNywxLjljMS41LDAuOCwyLjgsMS44LDQsMwoJCQkJCQljMS4yLDEuMiwyLjMsMi41LDMuMiwzLjljMC45LDEuNSwxLjYsMywyLjEsNC43YzAuNSwxLjcsMC44LDMuNCwwLjgsNS4yYzAsMS44LTAuMiwzLjUtMC42LDUuMmMtMC40LDEuNy0xLjEsMy4zLTEuOSw0LjcKCQkJCQkJYy0wLjgsMS41LTEuOCwyLjgtMyw0Yy0xLjIsMS4yLTIuNSwyLjMtMy45LDMuMmMtMS40LDAuOS0zLDEuNi00LjcsMi4xYy0xLjcsMC41LTMuNCwwLjgtNS4yLDAuOGMtMS44LDAtMy42LTAuMi01LjItMC42CgkJCQkJCWMtMS43LTAuNC0zLjMtMS4xLTQuNy0xLjljLTEuNS0wLjgtMi44LTEuOC00LTNjLTEuMi0xLjItMi4zLTIuNS0zLjItMy45Yy0wLjktMS40LTEuNi0zLTIuMS00LjcKCQkJCQkJQzk1Ny43LDYzNS41LDk1Ny41LDYzMy44LDk1Ny40LDYzMiBNOTYwLjEsNjMxLjljMCwxLjYsMC4yLDMuMSwwLjcsNC42YzAuNCwxLjUsMSwyLjgsMS44LDQuMWMwLjgsMS4zLDEuNywyLjQsMi43LDMuNAoJCQkJCQljMSwxLDIuMiwxLjksMy41LDIuNmMxLjMsMC43LDIuNiwxLjMsNC4xLDEuN2MxLjUsMC40LDMsMC42LDQuNiwwLjVjMi40LDAsNC42LTAuNSw2LjctMS41YzIuMS0wLjksMy44LTIuMiw1LjQtMy44CgkJCQkJCWMxLjUtMS42LDIuNy0zLjQsMy42LTUuNWMwLjktMi4xLDEuMy00LjQsMS4yLTYuOGMwLTEuNi0wLjMtMy4xLTAuNy00LjZjLTAuNC0xLjUtMS0yLjktMS44LTQuMWMtMC44LTEuMy0xLjctMi40LTIuNy0zLjUKCQkJCQkJYy0xLTEtMi4yLTEuOS0zLjUtMi43Yy0xLjMtMC43LTIuNi0xLjMtNC4xLTEuN2MtMS41LTAuNC0zLTAuNi00LjYtMC41Yy0yLjQsMC00LjYsMC41LTYuNiwxLjVjLTIuMSwwLjktMy44LDIuMi01LjMsMy44CgkJCQkJCWMtMS41LDEuNi0yLjcsMy41LTMuNSw1LjZDOTYwLjUsNjI3LjIsOTYwLjEsNjI5LjUsOTYwLjEsNjMxLjkgTTk3My42LDYzNGwwLjEsOWwtMy45LDAuMWwtMC40LTIyLjZsNy4zLTAuMQoJCQkJCQljMi45LDAsNS4xLDAuNCw2LjUsMS41YzEuNCwxLDIuMSwyLjYsMi4yLDQuNmMwLDEuNi0wLjQsMi45LTEuMyw0LjFjLTAuOSwxLjEtMi4yLDEuOS00LDIuNGMwLjMsMC4yLDAuNSwwLjQsMC44LDAuNgoJCQkJCQljMC4yLDAuMywwLjQsMC41LDAuNiwwLjlsNS45LDguNGwtMy43LDAuMWMtMC42LDAtMS0wLjItMS4zLTAuNmwtNS4yLTcuNmMtMC4yLTAuMi0wLjMtMC40LTAuNi0wLjVjLTAuMi0wLjEtMC41LTAuMi0xLTAuMgoJCQkJCQlMOTczLjYsNjM0eiBNOTczLjUsNjMxLjFsMi45LDBjMC45LDAsMS43LTAuMSwyLjQtMC4zYzAuNi0wLjIsMS4yLTAuNSwxLjYtMC44YzAuNC0wLjMsMC43LTAuOCwwLjgtMS4zCgkJCQkJCWMwLjItMC41LDAuMi0xLjEsMC4yLTEuN2MwLTAuNi0wLjEtMS4yLTAuMy0xLjZjLTAuMi0wLjUtMC40LTAuOS0wLjgtMS4yYy0wLjQtMC4zLTAuOS0wLjUtMS40LTAuN2MtMC42LTAuMS0xLjMtMC4yLTIuMi0wLjIKCQkJCQkJbC0zLjMsMC4xTDk3My41LDYzMS4xeiIvPgoJCQkJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik03OTQuMyw3MTIuNGMtNS43LTYuNS0xMS44LTEyLjctMTcuMi0xOS4zYy03LjYtOS40LTguMS0xOS44LTEuOS0yNi44YzEwLjEtMTAuOCwyOS04LjUsMzkuOS0zLjRsMC4xLDAKCQkJCQkJYzMuNiwxLjcsNy44LDAuNCw5LjUtM2MxLTIsMS45LTMuOCwzLTUuOWMwLDAtMS41LTEtMi4yLTEuNWMtMTUuOC0xMC42LTQ1LjMtMTMuNC02MS4yLDAuM2MtMTEuOSwxMC0xMy41LDI4LjQtMy4zLDQzLjUKCQkJCQkJYzQuMyw2LjQsMTAuMSwxMi4xLDE1LjIsMTguMWMzLjcsNC40LDcuOCw4LjUsMTEsMTMuMWM3LjksMTEuNSw2LjYsMjIuNy0yLjgsMzAuNGMtOC4xLDYuNi0xNy44LDcuNS0yOC44LDMKCQkJCQkJYy00LjEtMS43LTcuOS00LTEyLjEtNi4yYy0yLDQtNCw4LTYuMiwxMi4zYzEyLjUsMTAuNCwyOS43LDE0LjYsNDQuMSwxMC44YzE4LjEtNC43LDI5LjItMjAuNCwyNi43LTM4LjQKCQkJCQkJQzgwNi44LDcyOS40LDgwMS41LDcyMC42LDc5NC4zLDcxMi40Ii8+CgkJCQkJPHBhdGggY2xhc3M9InN0MSIgZD0iTTg1OS40LDY5NC45Yy03LTkuNi02LjgtMjAtMC4yLTI2LjljMTAuOC0xMC42LDI5LjUtNy43LDQwLjEtMi4zYzAsMCwwLDAsMC4xLDBjMy41LDEuOCw3LjgsMC42LDkuNy0yLjcKCQkJCQkJYzEuMS0xLjksMi4yLTMuNywzLjQtNS44YzAsMC0xLjUtMS4xLTIuMS0xLjZjLTE1LjItMTEtNDQuNS0xNC42LTYxLjItMS40Yy0xMi41LDkuNi0xNS4zLDI4LTYuMSw0My40CgkJCQkJCWMzLjksNi41LDkuMywxMi40LDE0LjEsMTguNWMzLjQsNC41LDcuMyw4LjcsMTAuMiwxMy40YzcuMSwxMS43LDUuMSwyMi45LTQuNywzMC4zYy04LjUsNi40LTE4LjIsNy0yOSwyLjIKCQkJCQkJYy00LTEuOC03LjYtNC4yLTExLjctNi41Yy0yLjMsMy45LTQuNSw3LjktNi45LDEyLjFjMTEuOCwxMC43LDI4LjgsMTUuNCw0My40LDEyYzE4LjQtNC4yLDMwLjUtMTkuNiwyOS4yLTM3LjYKCQkJCQkJYy0wLjgtMTAuMi01LjUtMTkuMS0xMi4yLTI3LjVDODcwLjEsNzA4LjEsODY0LjMsNzAxLjcsODU5LjQsNjk0LjkiLz4KCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNNzAzLjksNjQ0LjNjLTE2LjMsMC40LTI5LjEsOC0zOS41LDE4Yy0yMC4xLDE5LjMtMzQuNiw1Ni0yMy45LDkxLjFjNi41LDIxLjQsMjMuNiwzMS40LDQ1LjEsMjcuNgoJCQkJCQljMTEuMS0xLjksMjAuMy03LjIsMjguNi0xNC4xYzkuMy03LjcsMTYuNi0xNi45LDIyLTI3LjljLTEuOS0xLjEtMy44LTIuMy01LjctMy40Yy0zLjktMi4zLTktMS4yLTExLjYsMi41CgkJCQkJCWMtMi4zLDMuNC00LjcsNi42LTcuMiw5LjdjLTYuOSw4LjYtMTUuNSwxNS0yNywxNy43Yy01LjEsMS4yLTkuOCwxLjItMTMuOSwwLjFjLTMuNC0xLjItMTktOC41LTE3LjMtMzguOQoJCQkJCQljMTIuMS0yLjgsNjIuMy0xMC44LDc2LjItNDEuOGMwLjEtMC4xLDAuMS0wLjIsMC4yLTAuNGMxLjMtMi41LDIuMy01LjEsMy04LjFDNzM3LDY1OC41LDcyNCw2NDMuOCw3MDMuOSw2NDQuMyBNNzExLjYsNjg0LjkKCQkJCQkJYy0xNSwyMC40LTU2LjQsMjYuMi01Ni40LDI2LjNjLTAuMSwwLDEzLTUxLjIsNDkuMi01MS43YzMuNS0wLjEsNywwLjksOS42LDMuMkM3MTcuOCw2NjYsNzIwLjYsNjcyLjYsNzExLjYsNjg0LjkiLz4KCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTEwNi4yLDcyNi4zYy01LjItNi45LTEwLjgtMTMuNS0xNS42LTIwLjZjLTYuOC0xMC02LjUtMjAuNCwwLjItMjYuOWMxMC45LTEwLDI5LjYtNi4yLDQwLTAuM2wwLjEsMAoJCQkJCQljMy41LDIsNy43LDEsOS43LTIuMmMxLjEtMS45LDIuMi0zLjcsMy41LTUuN2MwLDAtMS41LTEuMS0yLjEtMS42Yy0xNS0xMS44LTQ0LjEtMTYuOS02MS00LjVjLTEyLjYsOS0xNS42LDI3LjMtNi43LDQzLjEKCQkJCQkJYzMuOCw2LjcsOS4xLDEyLjksMTMuNywxOS4zYzMuMyw0LjYsNy4yLDkuMSwxMCwxMy45YzYuOSwxMi4xLDQuOCwyMy4yLTUuMSwzMC4xYy04LjYsNi0xOC4zLDYuMS0yOC45LDAuOAoJCQkJCQljLTMuOS0yLTcuNi00LjYtMTEuNi03LjFjLTIuMywzLjgtNC43LDcuNy03LjEsMTEuOGMxMS42LDExLjMsMjguNSwxNi44LDQzLjEsMTQuMmMxOC40LTMuMywzMC43LTE4LjEsMjkuNy0zNi4yCgkJCQkJCUMxMTE3LjMsNzQ0LjMsMTExMi43LDczNS4xLDExMDYuMiw3MjYuMyIvPgoJCQkJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xMTgyLjMsNzQwLjljNS43LDEwLjQsOS40LDIwLDkuNCwzMS44YzAsMTcuMi0xNS4xLDM1LjMtMzMuOSwzNy44Yy0xNC44LDItMzAuNy0yLjgtNDEuMi0xNi41CgkJCQkJCWMwLDAsNC40LTUsNy42LTExLjJjMCwwLDQsMy45LDExLjEsOC4xYzEwLjQsNi4zLDIwLjMsNy41LDI5LjUsMS4yYzEwLjYtNy4yLDEzLjYtMjAuOSw3LjgtMzUuMWMtMi4zLTUuNy01LjctMTEuMS04LjYtMTYuNgoJCQkJCQljLTQtNy42LTkuMS0xNS0xMi40LTIyLjljLTguOS0yMS4zLTItMzcuOCwxMS40LTQ3LjNjMTgtMTMuMSw0OC4xLTYuOSw2Mi43LDlsLTQuNSw1LjJjLTIuNCwyLjgtNy4xLDMuOC0xMC4xLDEuNgoJCQkJCQljLTkuNi03LTI2LjctMTEuNy0zOS42LDAuMWMtNy41LDYuOC04LjgsMTguNC0yLjksMzAuMkMxMTcyLjgsNzI0LjgsMTE3Ny44LDczMi43LDExODIuMyw3NDAuOSIvPgoJCQkJCTxnPgoJCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzY5LjYsODIzLjNjLTI4LjUtMS4xLTUzLjgtMTIuOC03Mi4xLTM0LjFsMTEuNi0xMGMyOC45LDMzLjUsNjgsMzAuNyw4OC43LDI2LjEKCQkJCQkJCWMzMy45LTcuNiw2NS4yLTMwLjQsNzEuMy01Mi4xYzIuOC0xMCwyLjMtMTcuMy0xLjUtMjIuM2MtMTEuNC0xNS01NS40LTE0LjItOTQuMi0xNC4yYy01MC4yLDAuMS02My40LTIyLjMtNjYuNC0zNS4yCgkJCQkJCQljLTUuNy0yNC44LDE0LjktNTQuNCw0Ny45LTcwLjRjNjIuOC0zMC40LDEyOC41LTE0LjksMTMxLjMtMTQuM2wtMS42LDYuNWMtMS4xLDQuNy01LjcsOC40LTEwLjQsNy43CgkJCQkJCQljLTE5LTIuOS02Ny4zLTcuMy0xMTIuNiwxNC43Yy0yNS44LDEyLjUtNDIuOSwzNS4xLTM4LjksNTIuNGMzLjMsMTQuNCwyMS44LDIyLjYsNTAuNywyMi41YzU0LjYtMC4xLDkyLjIsMS40LDEwNy4xLDIxCgkJCQkJCQljNi44LDksOC4yLDIxLDQuMSwzNS43Yy03LjcsMjcuNS00My4yLDU0LTgzLjUsNjIuOUMzOTAuNCw4MjIuNywzNzkuOCw4MjMuNywzNjkuNiw4MjMuM3oiLz4KCQkJCQk8L2c+CgkJCQkJPHBhdGggY2xhc3M9InN0MSIgZD0iTTEwMjQuMSw2NTAuMWMtMTYuMy0xLjItMjkuOCw1LjItNDEuMSwxNC4yYy0yMS45LDE3LjMtMzkuOCw1Mi40LTMyLjUsODguNGM0LjUsMjEuOSwyMC41LDMzLjUsNDIuMiwzMS44CgkJCQkJCWMxMS4zLTAuOSwyMC45LTUuMiwyOS44LTExLjNjMTAtNi44LDE4LjEtMTUuMywyNC42LTI1LjdjLTEuOC0xLjMtMy42LTIuNi01LjMtMy45Yy0zLjctMi43LTguOC0yLjEtMTEuOCwxLjQKCQkJCQkJYy0yLjcsMy4xLTUuMyw2LjItOC4xLDljLTcuNyw3LjktMTYuOSwxMy41LTI4LjUsMTUuMWMtNS4yLDAuNy05LjksMC4zLTEzLjgtMS4yYy0zLjMtMS42LTE4LjEtMTAuMi0xMy41LTQwLjQKCQkJCQkJYzEyLjMtMS42LDYzLTQuOCw3OS44LTM0LjRjMC4xLTAuMSwwLjEtMC4yLDAuMi0wLjNjMS41LTIuMywyLjgtNC45LDMuNy03LjdDMTA1NS42LDY2Ny40LDEwNDQuMSw2NTEuNiwxMDI0LjEsNjUwLjEKCQkJCQkJIE0xMDI3LjgsNjkxLjNjLTE2LjksMTguOC01OC43LDIwLjctNTguNywyMC44Yy0wLjEsMCwxNy44LTQ5LjcsNTMuOS00Ni44YzMuNSwwLjMsNi45LDEuNiw5LjIsNC4xCgkJCQkJCUMxMDM1LjcsNjczLDEwMzgsNjc5LjksMTAyNy44LDY5MS4zIi8+CgkJCQk8L2c+CgkJCQk8Zz4KCQkJCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNNjQ3LDY1OS4zTDY0Nyw2NTkuM2wyLjQtMTEuN2MtMzcuMy0zLjYtNTcuNiwyMi44LTY1LjIsMzkuOGMwLjYtNi43LDEtMTMuNSwxLjctMjAuMwoJCQkJCQljMC44LTcuOS0zLjktMTEuMi05LjgtMTAuOWMwLDAtMzQuMSwyLjItNDUuOSwzLjJsMCwwYzEuOC0yNS45LDMuNy01MS4yLDUuNS03NC4zYy01LjIsMC4xLTExLjEsMC40LTE2LjMsMC45CgkJCQkJCWMtMS43LDIzLjItMy40LDQ4LjgtNS4xLDc0LjljLTI0LjYsMi40LTcxLjIsNy43LTcxLjIsNy43YzEuMSw5LjUsMi42LDEzLjgsMTMuNywxMi42YzE4LjgtMi4xLDM3LjctNC4zLDU2LjUtNi4xCgkJCQkJCWMtMi44LDQzLjEtNS4zLDg2LjgtNy4yLDEyMi45Yy0wLjQsNy42LDYuOCwxMy45LDE0LjQsMTMuMWMwLDAsMC4xLDAsMC4xLDBjMi4yLTQwLjYsNS4zLTg5LjYsOC42LTEzNy41CgkJCQkJCWM4LjgtMC44LDE2LjYtMiwzNS43LTMuMmMyLjUtMC4yLDUsMC4yLDQuOCwyLjdjLTIuOCwzNC45LTcuOCw4NC05LjcsMTE0LjNjMCwwLDcuOS0xLjIsMTUuMS0xLjRsNC42LTQ5LjUKCQkJCQkJYzEuMS0xMS4zLDMuNi0yMi41LDguMi0zMi44YzE0LjctMzMuMyw0MC43LTM5LDUyLjEtMzguOWwwLDBDNjQwLDY2NC43LDY0NS45LDY2NC44LDY0Nyw2NTkuM3oiLz4KCQkJCTwvZz4KCQkJPC9nPgoJCTwvZz4KCTwvZz4KPC9nPgo8L3N2Zz4K" alt="Stressless" style="height:48px;opacity:0.6;filter:brightness(2.5);">
+  </div>
+</div>
+
+<!-- SCROLLABLE AREA -->
+<div class="scroll-area">
+<div class="grid-total">
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot dot-neutral"></div> Strength / Positive</div>
+  <div class="legend-item"><div class="legend-dot dot-pain"></div> Pain Point / Problem</div>
+  <div class="legend-item"><div class="legend-dot dot-opp"></div> Improvement Opportunity</div>
+</div>
+
+<!-- PHASE HEADER ROW -->
+<div class="phase-row">
+  <div class="phase-label-cell"><span>Phases &rarr;</span></div>
+  <div class="phase-cell positive">
+    <div class="phase-num">01</div>
+    <div class="phase-name">Awareness</div>
+    <div class="phase-desc">Brand perception &amp; first contact</div>
+  </div>
+  <div class="phase-cell negative">
+    <div class="phase-num">02</div>
+    <div class="phase-name">Consideration</div>
+    <div class="phase-desc">Product discovery, inspiration</div>
+  </div>
+  <div class="phase-cell negative">
+    <div class="phase-num">03</div>
+    <div class="phase-name">Configuration</div>
+    <div class="phase-desc">Customise your recliner</div>
+  </div>
+  <div class="phase-cell negative">
+    <div class="phase-num">04</div>
+    <div class="phase-name">Purchase Decision</div>
+    <div class="phase-desc">Buy online or find a dealer</div>
+  </div>
+  <div class="phase-cell negative">
+    <div class="phase-num">05</div>
+    <div class="phase-name">Dealer Handover</div>
+    <div class="phase-desc">Contact &amp; closing at the dealer</div>
+  </div>
+</div>
+
+<!-- EMOTION CURVE ROW -->
+<div class="emotion-row">
+  <div class="emotion-label"><span>Emotional Curve</span></div>
+  <div class="emotion-chart">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <!-- Phase separators -->
+      <line x1="240" y1="0" x2="240" y2="120" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>
+      <line x1="480" y1="0" x2="480" y2="120" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>
+      <line x1="720" y1="0" x2="720" y2="120" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>
+      <line x1="960" y1="0" x2="960" y2="120" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>
+      <!-- Midline -->
+      <line x1="0" y1="60" x2="1200" y2="60" stroke="rgba(201,168,76,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+
+      <defs>
+        <linearGradient id="emotionGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.6"/>
+          <stop offset="35%" stop-color="#c9a84c" stop-opacity="0.6"/>
+          <stop offset="50%" stop-color="#e74c3c" stop-opacity="0.6"/>
+          <stop offset="75%" stop-color="#c0392b" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#e74c3c" stop-opacity="0.5"/>
+        </linearGradient>
+        <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.12"/>
+          <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Fill -->
+      <path d="M 0,60 C 60,10 180,10 240,14 C 300,18 420,16 480,18 C 540,22 620,80 720,92 C 810,102 860,110 960,104 C 1050,97 1140,94 1200,97 L 1200,120 L 0,120 Z"
+            fill="url(#fillGrad)" opacity="0.5"/>
+      <!-- Line -->
+      <path d="M 0,60 C 60,10 180,10 240,14 C 300,18 420,16 480,18 C 540,22 620,80 720,92 C 810,102 860,110 960,104 C 1050,97 1140,94 1200,97"
+            fill="none" stroke="url(#emotionGrad)" stroke-width="2.5" stroke-linecap="round"/>
+
+      <!-- Dots (centered in each phase column: 120, 360, 600, 840, 1080) -->
+      <circle cx="120" cy="20" r="4" fill="#c9a84c" opacity="0.9"/>
+      <circle cx="360" cy="17" r="4" fill="#c9a84c" opacity="0.9"/>
+      <circle cx="600" cy="55" r="5" fill="#e74c3c" opacity="0.9"/>
+      <circle cx="840" cy="107" r="5" fill="#c0392b" opacity="0.9"/>
+      <circle cx="1080" cy="100" r="4" fill="#e74c3c" opacity="0.7"/>
+
+      <!-- Labels -->
+      <text x="120" y="12" fill="#c9a84c" font-size="9" font-family="DM Sans" text-anchor="middle" opacity="0.8">Excitement</text>
+      <text x="360" y="10" fill="#c9a84c" font-size="9" font-family="DM Sans" text-anchor="middle" opacity="0.8">Interest</text>
+      <text x="600" y="48" fill="#e74c3c" font-size="9" font-family="DM Sans" text-anchor="middle" opacity="0.9">Frustration</text>
+      <text x="840" y="100" fill="#c0392b" font-size="9" font-family="DM Sans" text-anchor="middle" opacity="0.9">Drop-off</text>
+      <text x="1080" y="93" fill="#e74c3c" font-size="9" font-family="DM Sans" text-anchor="middle" opacity="0.7">Uncertainty</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ROW: TOUCHPOINTS -->
+<div class="swim-row">
+  <div class="swim-label"><div class="swim-label-text">Touchpoints</div></div>
+  <div class="swim-cell">
+    <div class="card positive">
+      <div class="card-type">Positive</div>
+      <div class="card-text">Large-format campaign imagery, brand films, social media ads. Origin, materials &amp; craftsmanship are communicated authentically and in detail.</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card pain">
+      <div class="card-type">Pain Point</div>
+      <div class="card-text">No personalised entry point: no configuration history, no product recommendations, no complementary products or care tips for previously purchased recliners</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card pain">
+      <div class="card-type">Pain Point</div>
+      <div class="card-text">Configurator difficult to use, unclear UI elements. AR app exists, but desktop configurations are not visible within it &ndash; system disconnect</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card pain">
+      <div class="card-type">Pain Point</div>
+      <div class="card-text">Many products not available for online purchase &ndash; only dealer search possible. No preferred dealer can be saved. No chat, no advisory, no personal contact during the purchase process</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card pain">
+      <div class="card-type">Pain Point</div>
+      <div class="card-text">Dealer is selected, but the configuration is lost in the process</div>
+    </div>
+  </div>
+</div>
+
+<!-- ROW: USER THOUGHTS -->
+<div class="swim-row">
+  <div class="swim-label"><div class="swim-label-text">User Thoughts</div></div>
+  <div class="swim-cell">
+    <div class="card positive">
+      <div class="card-type">Positive</div>
+      <div class="card-text">&ldquo;This brand stands for quality and style &ndash; exactly my level.&rdquo;</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card pain">
+      <div class="card-type">Frustration</div>
+      <div class="card-text">&ldquo;What did I last configure? Are there matching accessories for my recliner? I can&rsquo;t find anything here that fits me.&rdquo;</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card pain">
+      <div class="card-type">Frustration</div>
+      <div class="card-text">&ldquo;Why can&rsquo;t I click? And I have the app &ndash; but my configured recliner is nowhere to be found in it.&rdquo;</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card pain">
+      <div class="card-type">Frustration</div>
+      <div class="card-text">&ldquo;Not available? And I can&rsquo;t even save my preferred dealer. I have a question right now &ndash; but who do I ask? There&rsquo;s nobody here.&rdquo;</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card pain">
+      <div class="card-type">Drop-off</div>
+      <div class="card-text">&ldquo;I have to explain everything from scratch. That&rsquo;s too much effort.&rdquo;</div>
+    </div>
+  </div>
+</div>
+
+<!-- ROW: OPPORTUNITIES -->
+<div class="swim-row">
+  <div class="swim-label"><div class="swim-label-text">Opportunities</div></div>
+  <div class="swim-cell">
+    <div class="card positive">
+      <div class="card-type">Build on Strength</div>
+      <div class="card-text">Authentic brand world already strong &ndash; testimonials &amp; customer voices as additional social proof could further strengthen trust</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card opportunity">
+      <div class="card-type">Opportunity</div>
+      <div class="card-text">Personalised entry point: own configurations, individual recommendations, complementary products, new arrivals &amp; care products matching the purchased recliner</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card opportunity">
+      <div class="card-type">Opportunity</div>
+      <div class="card-text">UX redesign of the configurator. Side-by-side comparison of two configured products incl. colour combinations. Transfer desktop configuration to AR app &ndash; place recliner in your own room</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card opportunity">
+      <div class="card-type">Opportunity</div>
+      <div class="card-text">Save preferred dealer in account. Live chat or personal advisor directly in the shop &ndash; with seamless handover to the saved dealer including full configuration context when needed</div>
+    </div>
+  </div>
+  <div class="swim-cell">
+    <div class="card opportunity">
+      <div class="card-type">Opportunity</div>
+      <div class="card-text">Digital dealer handover: configuration preserved, appointment bookable</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /grid-total -->
+</div><!-- /scroll-area -->
+
+<!-- RECOMMENDATIONS (non-scrolling) -->
+<div class="rec-section">
+  <div class="rec-header">
+    <div class="rec-section-title">Recommendations for a<br><em>seamless purchase experience</em></div>
+    <div class="rec-tagline">The brand emotionality is strong &ndash;<br>the purchase process must<br>live up to this standard.</div>
+  </div>
+  <div class="rec-grid">
+    <div class="rec-card">
+      <div class="rec-num">1</div>
+      <div class="rec-tag">UX &middot; Configurator</div>
+      <div class="rec-title">Fundamentally redesign the configurator</div>
+      <div class="rec-body">Clear, unambiguously clickable elements with hover states. Active state always visible. Save configuration (account or link), load, share &ndash; not just share. Progress indicator for the user.</div>
+      <div class="rec-impact">&uarr; Conversion &middot; &darr; Drop-off rate</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">2</div>
+      <div class="rec-tag">Omnichannel &middot; Advisory &middot; Dealer</div>
+      <div class="rec-title">Personal Contact &amp; Preferred Dealer</div>
+      <div class="rec-body">A live chat or personal advisor accompanies the purchase process from the start &ndash; for complex questions about materials, fit, or delivery times. The saved preferred dealer can be brought in on request: they see the configuration and take over the consultation personally. This creates an early human connection &ndash; online and in-store.</div>
+      <div class="rec-impact">&uarr; Close rate &middot; &uarr; Dealer relationship &middot; &darr; Drop-offs from unanswered questions</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">3</div>
+      <div class="rec-tag">Technology &middot; Omnichannel</div>
+      <div class="rec-title">Seamlessly connect AR app &amp; desktop</div>
+      <div class="rec-body">The AR app exists &ndash; but desktop configurations are not visible within it. This system disconnect must be resolved: recliners created in the online configurator must be directly accessible in the app to place them in your own room. A shared account as common data layer connects both channels.</div>
+      <div class="rec-impact">&uarr; AR usage &middot; &uarr; Purchase readiness &middot; System disconnect resolved</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">4</div>
+      <div class="rec-tag">UX &middot; Decision Support</div>
+      <div class="rec-title">Compare configured products</div>
+      <div class="rec-body">Compare two individually configured models side by side &ndash; including different colour combinations, materials, comfort levels, and prices. Especially valuable when customers are weighing two options. Reduces cognitive load and accelerates the decision.</div>
+      <div class="rec-impact">&uarr; Decision quality &middot; &darr; Purchase drop-offs</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">5</div>
+      <div class="rec-tag">Availability &middot; Dealer Handover</div>
+      <div class="rec-title">Seamless configuration handover</div>
+      <div class="rec-body">The saved configuration loads directly at the preferred dealer &ndash; no restart, no explaining from scratch. Appointment booking directly from the shop. Position dealer channel and online channel as complementary: &ldquo;Configure online, experience in-store.&rdquo;</div>
+      <div class="rec-impact">&uarr; Qualified leads &middot; &uarr; Customer satisfaction &middot; Dealer workload reduced</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">6</div>
+      <div class="rec-tag">Personalisation &middot; CRM</div>
+      <div class="rec-title">Personalised shop entry</div>
+      <div class="rec-body">See your own context immediately on login: saved configurations, recommendations based on purchase history, complementary products for your existing recliner (e.g. matching ottomans, tables), latest arrivals, and care products. The shop welcomes you &ndash; not just lists.</div>
+      <div class="rec-impact">&uarr; Return rate &middot; &uarr; Cross-sell &middot; &uarr; Customer retention</div>
+    </div>
+  </div>
+</div>
+
+<div class="footnote">
+  <span>Stressless Online Shop &middot; CX Analysis &middot; Sales Funnel</span>
+  <span>Current State &rarr; Recommendations &rarr; Target Vision</span>
+</div>
+
+</body>
+</html>

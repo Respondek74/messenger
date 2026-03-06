@@ -18,7 +18,7 @@
     justify-content: center;
   }
   .container {
-    max-width: 720px;
+    max-width: 1020px;
     width: 100%;
     padding: 0 40px;
     display: flex;
@@ -65,6 +65,7 @@
   }
   .card:nth-child(1) { animation: fadeUp 0.7s ease 0.8s forwards; }
   .card:nth-child(2) { animation: fadeUp 0.7s ease 0.95s forwards; }
+  .card:nth-child(3) { animation: fadeUp 0.7s ease 1.1s forwards; }
   .card:hover {
     border-color: transparent;
     box-shadow: 0 12px 40px rgba(0,0,0,0.08);
@@ -118,12 +119,12 @@
     letter-spacing: 1px;
     text-align: center;
     opacity: 0;
-    animation: fadeUp 0.6s ease 1.1s forwards;
+    animation: fadeUp 0.6s ease 1.3s forwards;
   }
   @keyframes fadeUp {
     to { opacity: 1; transform: translateY(0); }
   }
-  @media (max-width: 640px) {
+  @media (max-width: 900px) {
     .cards { flex-direction: column; }
     .headline { font-size: 28px; }
   }
@@ -152,6 +153,14 @@
       <div class="card-title">Service Design Blueprint</div>
       <div class="card-desc">All actors, frontstage and backstage processes, and support systems mapped across the full journey. The operational backbone.</div>
       <div class="card-cta" style="color: #8B7D9B;">Open Blueprint <span>→</span></div>
+    </a>
+
+    <a href="Ekornes_Expert_Review.html" class="card">
+      <div class="card-icon" style="background: rgba(201,168,76,0.1);">◉</div>
+      <div class="card-label">Analysis</div>
+      <div class="card-title">Expert Review &amp; Pain Points</div>
+      <div class="card-desc">CX analysis of the current sales funnel. Five journey phases with identified pain points, user frustrations, and concrete improvement recommendations.</div>
+      <div class="card-cta" style="color: #C9A84C;">Open Review <span>→</span></div>
     </a>
   </div>
 
