@@ -253,8 +253,19 @@ function App() {
   var hoverCol = ref[0];
   var setHoverCol = ref[1];
   var scrollRef = useRef(null);
+  var phaseRef = useRef(null);
+  var dragState = useRef({ isDown: false, startX: 0, scrollLeft: 0 });
 
   var totalW = LABEL_W + (COL_W + GAP) * 7 + 40;
+
+  useEffect(function() {
+    var content = scrollRef.current;
+    var header = phaseRef.current;
+    if (!content || !header) return;
+    function syncScroll() { header.scrollLeft = content.scrollLeft; }
+    content.addEventListener('scroll', syncScroll);
+    return function() { content.removeEventListener('scroll', syncScroll); };
+  }, []);
 
   function renderRow(layer, rowIndex) {
     if (layer.items === null) {
@@ -387,7 +398,7 @@ function App() {
     );
   }
 
-  return h('div', { style: { minHeight: '100vh', overflow: 'hidden' } },
+  return h('div', { style: { minHeight: '100vh' } },
 
     // Header (fixed, does not scroll horizontally)
     h('div', {
@@ -414,61 +425,95 @@ function App() {
       )
     ),
 
-    // Scrollable content area
-    h('div', { style: { overflowX: 'auto', overflowY: 'visible' } },
-
-    // Phase Header Row
+    // Phase Header Row (sticky at viewport top, scroll synced)
     h('div', {
+      ref: phaseRef,
       style: {
-        display: 'flex',
-        alignItems: 'stretch',
-        borderBottom: '1px solid #E8E4DF',
-        minWidth: totalW + 'px',
         position: 'sticky',
         top: 0,
-        zIndex: 5,
+        zIndex: 10,
+        overflowX: 'hidden',
         background: '#FAF8F5'
       }
     },
       h('div', {
         style: {
-          width: LABEL_W + 'px',
-          minWidth: LABEL_W + 'px',
-          padding: '16px 16px 16px 24px',
-          borderRight: '1px solid #E8E4DF',
-          position: 'sticky',
-          left: 0,
-          background: '#FAF8F5',
-          zIndex: 6,
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'stretch',
+          borderBottom: '1px solid #E8E4DF',
+          minWidth: totalW + 'px'
         }
       },
-        h('span', { style: { fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '2px', textTransform: 'uppercase', color: '#999' } }, 'Layers \u2193  /  Phases \u2192')
-      ),
-      phaseNames.map(function(name, i) {
-        return h('div', {
-          key: i,
-          onMouseEnter: function() { setHoverCol(i); },
-          onMouseLeave: function() { setHoverCol(-1); },
+        h('div', {
           style: {
-            width: COL_W + 'px',
-            minWidth: COL_W + 'px',
-            padding: '14px 14px',
-            textAlign: 'center',
+            width: LABEL_W + 'px',
+            minWidth: LABEL_W + 'px',
+            padding: '16px 16px 16px 24px',
             borderRight: '1px solid #E8E4DF',
-            borderBottom: '3px solid ' + (hoverCol === i ? colors[i] : 'transparent'),
-            transition: 'border-color 0.3s, opacity 0.3s',
-            opacity: hoverCol === -1 || hoverCol === i ? 1 : 0.5,
-            cursor: 'default'
+            position: 'sticky',
+            left: 0,
+            background: '#FAF8F5',
+            zIndex: 11,
+            display: 'flex',
+            alignItems: 'center'
           }
         },
-          h('div', { style: { fontSize: '20px', marginBottom: '4px', color: colors[i] } }, phaseIcons[i]),
-          h('div', { style: { fontSize: '12px', fontWeight: 600, color: colors[i], letterSpacing: '1px', textTransform: 'uppercase' } }, name),
-          h('div', { style: { fontSize: '9px', color: '#999', marginTop: '2px' } }, phaseSubtitles[i])
-        );
-      })
+          h('span', { style: { fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '2px', textTransform: 'uppercase', color: '#999' } }, 'Layers \u2193  /  Phases \u2192')
+        ),
+        phaseNames.map(function(name, i) {
+          return h('div', {
+            key: i,
+            onMouseEnter: function() { setHoverCol(i); },
+            onMouseLeave: function() { setHoverCol(-1); },
+            style: {
+              width: COL_W + 'px',
+              minWidth: COL_W + 'px',
+              padding: '14px 14px',
+              textAlign: 'center',
+              borderRight: '1px solid #E8E4DF',
+              borderBottom: '3px solid ' + (hoverCol === i ? colors[i] : 'transparent'),
+              transition: 'border-color 0.3s, opacity 0.3s',
+              opacity: hoverCol === -1 || hoverCol === i ? 1 : 0.5,
+              cursor: 'default'
+            }
+          },
+            h('div', { style: { fontSize: '20px', marginBottom: '4px', color: colors[i] } }, phaseIcons[i]),
+            h('div', { style: { fontSize: '12px', fontWeight: 600, color: colors[i], letterSpacing: '1px', textTransform: 'uppercase' } }, name),
+            h('div', { style: { fontSize: '9px', color: '#999', marginTop: '2px' } }, phaseSubtitles[i])
+          );
+        })
+      )
     ),
+
+    // Scrollable content area
+    h('div', {
+      ref: scrollRef,
+      style: { overflowX: 'auto', overflowY: 'visible', cursor: 'grab', userSelect: 'none' },
+      onMouseDown: function(e) {
+        var el = scrollRef.current;
+        dragState.current = { isDown: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
+        el.style.cursor = 'grabbing';
+        if (phaseRef.current) phaseRef.current.style.cursor = 'grabbing';
+      },
+      onMouseLeave: function() {
+        dragState.current.isDown = false;
+        scrollRef.current.style.cursor = 'grab';
+        if (phaseRef.current) phaseRef.current.style.cursor = '';
+      },
+      onMouseUp: function() {
+        dragState.current.isDown = false;
+        scrollRef.current.style.cursor = 'grab';
+        if (phaseRef.current) phaseRef.current.style.cursor = '';
+      },
+      onMouseMove: function(e) {
+        if (!dragState.current.isDown) return;
+        e.preventDefault();
+        var el = scrollRef.current;
+        var x = e.pageX - el.offsetLeft;
+        var walk = (x - dragState.current.startX) * 1.5;
+        el.scrollLeft = dragState.current.scrollLeft - walk;
+      }
+    },
 
     // Actors row
     renderActors(),
