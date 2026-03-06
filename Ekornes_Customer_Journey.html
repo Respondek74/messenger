@@ -18,7 +18,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
-const { useState, createElement: h } = React;
+const { useState, useRef, useEffect, createElement: h } = React;
 
 const phases = [
   {
@@ -90,8 +90,46 @@ var STRESSLESS_LOGO = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmN
 
 function App() {
   const [active, setActive] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [audioProgress, setAudioProgress] = useState(0);
+  const audioRef = useRef(null);
   const phase = phases[active];
   const sans = "'DM Sans', Helvetica, sans-serif";
+
+  useEffect(function() {
+    var audio = audioRef.current;
+    if (!audio) return;
+    function onTime() { setAudioProgress(audio.currentTime); }
+    function onMeta() { setAudioDuration(audio.duration); }
+    function onEnd() { setIsPlaying(false); setAudioProgress(0); }
+    audio.addEventListener('timeupdate', onTime);
+    audio.addEventListener('loadedmetadata', onMeta);
+    audio.addEventListener('ended', onEnd);
+    function onBeforeUnload() { audio.pause(); audio.currentTime = 0; }
+    window.addEventListener('beforeunload', onBeforeUnload);
+    window.addEventListener('pagehide', onBeforeUnload);
+    return function() {
+      audio.removeEventListener('timeupdate', onTime);
+      audio.removeEventListener('loadedmetadata', onMeta);
+      audio.removeEventListener('ended', onEnd);
+      window.removeEventListener('beforeunload', onBeforeUnload);
+      window.removeEventListener('pagehide', onBeforeUnload);
+    };
+  }, []);
+
+  function toggleAudio() {
+    var audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) { audio.pause(); } else { audio.play(); }
+    setIsPlaying(!isPlaying);
+  }
+
+  function formatTime(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
 
   return h('div', { style: { minHeight: '100vh', background: '#FAF8F5', fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C', overflowX: 'hidden' } },
 
@@ -107,9 +145,48 @@ function App() {
           h('h1', { style: { fontSize: '32px', fontWeight: 300, margin: 0, lineHeight: 1.2, color: '#1A1A1A' } }, 'From First Impression to Lifelong Relationship'),
           h('p', { style: { fontFamily: sans, fontSize: '13px', color: '#888', margin: '8px 0 0', maxWidth: '620px', lineHeight: 1.5 } }, 'Seven phases of a seamless experience \u2014 from digital inspiration through the haptic bridge to in-store purchase and beyond.')
         ),
-        h('img', { src: STRESSLESS_LOGO, alt: 'Stressless', style: { height: '56px', marginTop: '4px', opacity: 0.85 } })
+        h('div', { style: { display: 'flex', alignItems: 'center', gap: '24px', flexShrink: 0 } },
+
+          // Audio player
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', background: '#F5F2EF', borderRadius: '28px', padding: '8px 16px 8px 8px', border: '1px solid #E8E4DF', transition: 'all 0.3s', cursor: 'pointer' }, onClick: toggleAudio,
+            onMouseEnter: function(e) { e.currentTarget.style.background = '#EDE9E4'; },
+            onMouseLeave: function(e) { e.currentTarget.style.background = '#F5F2EF'; }
+          },
+            // Play/Pause icon
+            h('div', { style: { width: '32px', height: '32px', borderRadius: '50%', background: isPlaying ? '#1A1A1A' : '#C9A84C', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.3s', flexShrink: 0 } },
+              isPlaying
+                ? h('svg', { width: 12, height: 12, viewBox: '0 0 12 12', fill: 'white' },
+                    h('rect', { x: 1.5, y: 1, width: 3, height: 10, rx: 0.5 }),
+                    h('rect', { x: 7.5, y: 1, width: 3, height: 10, rx: 0.5 })
+                  )
+                : h('svg', { width: 12, height: 12, viewBox: '0 0 12 12', fill: 'white' },
+                    h('polygon', { points: '2,0 12,6 2,12' })
+                  )
+            ),
+            // Label + progress
+            h('div', { style: { display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '90px' } },
+              h('span', { style: { fontFamily: sans, fontSize: '9px', letterSpacing: '1.5px', textTransform: 'uppercase', color: isPlaying ? '#1A1A1A' : '#999', transition: 'color 0.3s', fontWeight: 500 } },
+                isPlaying ? 'Now playing' : 'Listen'
+              ),
+              audioDuration > 0
+                ? h('div', { style: { display: 'flex', alignItems: 'center', gap: '6px' } },
+                    h('div', { style: { flex: 1, height: '2px', background: '#DDD', borderRadius: '1px', overflow: 'hidden', position: 'relative' }, onClick: function(e) { e.stopPropagation(); var rect = e.currentTarget.getBoundingClientRect(); var pct = (e.clientX - rect.left) / rect.width; audioRef.current.currentTime = pct * audioDuration; } },
+                      h('div', { style: { position: 'absolute', left: 0, top: 0, bottom: 0, width: (audioProgress / audioDuration * 100) + '%', background: isPlaying ? '#1A1A1A' : '#C9A84C', borderRadius: '1px', transition: 'width 0.2s linear' } })
+                    ),
+                    h('span', { style: { fontFamily: sans, fontSize: '9px', color: '#BBB', whiteSpace: 'nowrap', minWidth: '32px' } }, formatTime(isPlaying ? audioProgress : audioDuration))
+                  )
+                : null
+            )
+          ),
+
+          // Logo
+          h('img', { src: STRESSLESS_LOGO, alt: 'Stressless', style: { height: '56px', marginTop: '4px', opacity: 0.85 } })
+        )
       )
     ),
+
+    // Hidden audio element
+    h('audio', { ref: audioRef, src: 'audio.mp3', preload: 'metadata' }),
 
     // Phase Timeline
     h('div', { style: { display: 'flex', alignItems: 'stretch', borderBottom: '1px solid #E8E4DF', overflow: 'auto' } },

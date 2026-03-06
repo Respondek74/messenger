@@ -112,10 +112,49 @@
     transition: gap 0.3s ease;
   }
   .card:hover .card-cta { gap: 10px; }
+  /* Mini audio player */
+  .mini-player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #F5F2EF;
+    border-radius: 24px;
+    padding: 6px 14px 6px 6px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border: 1px solid #E8E4DF;
+  }
+  .mini-player:hover { background: #EDE9E4; }
+  .mp-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .mp-info {
+    display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0;
+  }
+  .mp-label {
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; transition: color 0.3s;
+  }
+  .mp-bar-wrap {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .mp-bar {
+    flex: 1; height: 2px; background: #DDD; border-radius: 1px; overflow: hidden; position: relative;
+  }
+  .mp-fill {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 0%; border-radius: 1px; transition: width 0.2s linear;
+  }
+  .mp-time {
+    font-size: 9px; color: #BBB; white-space: nowrap; min-width: 28px;
+  }
   .footer {
     margin-top: 64px;
     font-size: 10px;
-    color: #CCC;
+    color: #BBB;
     letter-spacing: 1px;
     text-align: center;
     opacity: 0;
@@ -139,11 +178,33 @@
   <div class="sub">Sybit GmbH — Division Creation — March 2026</div>
 
   <div class="cards">
+    <a href="Ekornes_Expert_Review.html" class="card">
+      <div class="card-icon" style="background: rgba(201,168,76,0.1);">◉</div>
+      <div class="card-label">Analysis</div>
+      <div class="card-title">Expert Review &amp; Pain Points</div>
+      <div class="card-desc">CX analysis of the current sales funnel. Five journey phases with identified pain points, user frustrations, and concrete improvement recommendations.</div>
+      <div class="card-cta" style="color: #C9A84C;">Open Review <span>→</span></div>
+    </a>
+
     <a href="Ekornes_Customer_Journey.html" class="card">
       <div class="card-icon" style="background: rgba(107,143,113,0.1);">◈</div>
       <div class="card-label">Interactive</div>
       <div class="card-title">Customer Journey Narrative</div>
       <div class="card-desc">Seven phases from first brand contact to lifelong relationship. Explore touchpoints, customer actions, and required systems for each phase.</div>
+      <div class="mini-player" id="miniPlayer" onclick="event.preventDefault(); event.stopPropagation(); toggleMiniAudio();">
+        <div class="mp-btn" id="mpBtn" style="background: #6B8F71;">
+          <svg id="mpPlayIcon" width="10" height="10" viewBox="0 0 12 12" fill="white"><polygon points="3,0 12,6 3,12"/></svg>
+          <svg id="mpPauseIcon" width="10" height="10" viewBox="0 0 12 12" fill="white" style="display:none;"><rect x="1.5" y="1" width="3" height="10" rx="0.5"/><rect x="7.5" y="1" width="3" height="10" rx="0.5"/></svg>
+        </div>
+        <div class="mp-info">
+          <span class="mp-label" id="mpLabel" style="color: #999;">Listen to narrative</span>
+          <div class="mp-bar-wrap">
+            <div class="mp-bar" onclick="event.stopPropagation(); seekMiniAudio(event);"><div class="mp-fill" id="mpFill" style="background: #6B8F71;"></div></div>
+            <span class="mp-time" id="mpTime"></span>
+          </div>
+        </div>
+      </div>
+      <audio id="miniAudio" src="audio.mp3" preload="metadata"></audio>
       <div class="card-cta" style="color: #6B8F71;">Open Journey <span>→</span></div>
     </a>
 
@@ -154,18 +215,77 @@
       <div class="card-desc">All actors, frontstage and backstage processes, and support systems mapped across the full journey. The operational backbone.</div>
       <div class="card-cta" style="color: #8B7D9B;">Open Blueprint <span>→</span></div>
     </a>
-
-    <a href="Ekornes_Expert_Review.html" class="card">
-      <div class="card-icon" style="background: rgba(201,168,76,0.1);">◉</div>
-      <div class="card-label">Analysis</div>
-      <div class="card-title">Expert Review &amp; Pain Points</div>
-      <div class="card-desc">CX analysis of the current sales funnel. Five journey phases with identified pain points, user frustrations, and concrete improvement recommendations.</div>
-      <div class="card-cta" style="color: #C9A84C;">Open Review <span>→</span></div>
-    </a>
   </div>
 
   <div class="footer">SYBIT GMBH — DIVISION CREATION — EKORNES CONCEPT 2026</div>
 </div>
 
+<script>
+var miniAudio = document.getElementById('miniAudio');
+var mpBtn = document.getElementById('mpBtn');
+var mpLabel = document.getElementById('mpLabel');
+var mpFill = document.getElementById('mpFill');
+var mpTime = document.getElementById('mpTime');
+var mpPlayIcon = document.getElementById('mpPlayIcon');
+var mpPauseIcon = document.getElementById('mpPauseIcon');
+var miniPlaying = false;
+
+function fmt(s) {
+  var m = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+miniAudio.addEventListener('loadedmetadata', function() {
+  mpTime.textContent = fmt(miniAudio.duration);
+});
+
+miniAudio.addEventListener('timeupdate', function() {
+  if (miniAudio.duration) {
+    mpFill.style.width = (miniAudio.currentTime / miniAudio.duration * 100) + '%';
+    mpTime.textContent = fmt(miniPlaying ? miniAudio.currentTime : miniAudio.duration);
+  }
+});
+
+miniAudio.addEventListener('ended', function() {
+  miniPlaying = false;
+  mpBtn.style.background = '#6B8F71';
+  mpLabel.textContent = 'Listen to narrative';
+  mpLabel.style.color = '#999';
+  mpPlayIcon.style.display = '';
+  mpPauseIcon.style.display = 'none';
+  mpFill.style.width = '0%';
+  mpTime.textContent = fmt(miniAudio.duration);
+});
+
+function toggleMiniAudio() {
+  if (miniPlaying) {
+    miniAudio.pause();
+    miniPlaying = false;
+    mpBtn.style.background = '#6B8F71';
+    mpLabel.textContent = 'Listen to narrative';
+    mpLabel.style.color = '#999';
+    mpPlayIcon.style.display = '';
+    mpPauseIcon.style.display = 'none';
+  } else {
+    miniAudio.play();
+    miniPlaying = true;
+    mpBtn.style.background = '#1A1A1A';
+    mpLabel.textContent = 'Now playing';
+    mpLabel.style.color = '#1A1A1A';
+    mpPlayIcon.style.display = 'none';
+    mpPauseIcon.style.display = '';
+  }
+}
+
+function seekMiniAudio(e) {
+  var rect = e.currentTarget.getBoundingClientRect();
+  var pct = (e.clientX - rect.left) / rect.width;
+  miniAudio.currentTime = pct * miniAudio.duration;
+}
+
+window.addEventListener('beforeunload', function() { miniAudio.pause(); miniAudio.currentTime = 0; });
+window.addEventListener('pagehide', function() { miniAudio.pause(); miniAudio.currentTime = 0; });
+</script>
 </body>
 </html>
