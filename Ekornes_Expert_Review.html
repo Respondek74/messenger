@@ -24,7 +24,7 @@
     --text-dim: #6b6254;
     --border: rgba(201,168,76,0.15);
     --label-w: 160px;
-    --col-w: 240px;
+    --col-min: 220px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -70,7 +70,7 @@
     overflow-y: visible;
   }
   .grid-total {
-    min-width: calc(var(--label-w) + var(--col-w) * 5 + 40px);
+    min-width: calc(var(--label-w) + var(--col-min) * 5);
   }
 
   /* LEGEND */
@@ -126,8 +126,8 @@
     color: var(--text-dim);
   }
   .phase-cell {
-    width: var(--col-w);
-    min-width: var(--col-w);
+    flex: 1;
+    min-width: var(--col-min);
     padding: 16px 20px;
     text-align: center;
     border-right: 1px solid rgba(255,255,255,0.03);
@@ -183,7 +183,7 @@
   }
   .emotion-chart {
     flex: 1;
-    min-width: calc(var(--col-w) * 5);
+    min-width: calc(var(--col-min) * 5);
     height: 120px;
     position: relative;
   }
@@ -219,8 +219,8 @@
     writing-mode: horizontal-tb;
   }
   .swim-cell {
-    width: var(--col-w);
-    min-width: var(--col-w);
+    flex: 1;
+    min-width: var(--col-min);
     padding: 16px 14px;
     border-right: 1px solid rgba(255,255,255,0.03);
     display: flex;
@@ -360,7 +360,7 @@
   .swim-row:nth-child(even) { background: var(--surface); }
 
   @media (max-width: 900px) {
-    :root { --col-w: 200px; --label-w: 130px; }
+    :root { --col-min: 180px; --label-w: 130px; }
     .header { padding: 32px 24px 24px; }
     .title { font-size: 28px; }
     .rec-grid { grid-template-columns: 1fr; }
